@@ -11,7 +11,7 @@ CREATE TABLE departamento
 ( 
 	id_departamento      integer PRIMARY KEY AUTO_INCREMENT ,
 	cod_departamento     varchar(10)  NOT NULL ,
-	des_departamaento    varchar(100)  NOT NULL ,
+	des_departamento     varchar(100)  NOT NULL ,
 	fec_creacion         datetime  NOT NULL ,
 	fec_modificacion     datetime  default NULL ,
 	id_pais              integer  NOT NULL 
