@@ -1,74 +1,35 @@
-from flask import Flask, request, jsonify, make_response, render_template
-import config
+from flask import Flask, request #, jsonify, make_response, render_template
+from config import Config
 from datetime import datetime
 from json import loads
 from flask_cors import CORS
+import mysql.connector
+from model import Dispatcher
 
 app = Flask(__name__)
 CORS(app)
+config = Config()
+
+connection = mysql.connector.connect(host=config.MYSQL_HOST,
+                                     database=config.MYSQL_DB,
+                                     user=config.MYSQL_USER,
+                                     password=config.MYSQL_PASSWORD)
+
+dispatcher = Dispatcher(connection)
 
 
-@app.route('/')
-def hello():
-    return render_template('index.html')
-
-
-@app.route('/departamento', methods=['POST'])
-def getDepartmentById():
+@app.route('/ubigeo', methods=['POST'])
+def getUbigeoByCod():
     payload = loads(request.data.decode('utf8').replace("'", '"'))
-    if payload["valor"] != "" and payload["campo"] != "":
-        condition = f'where {payload["campo"]} = "{payload["valor"]}";'
-    else:
-        condition = ""
-
-    query = f'select * from {payload["table"]} {condition}'
-
-    cur = config.db.cursor()
-    cur.execute(query)
-    departamentos = cur.fetchall()
-    departamentosArray = {
-        "depas": []
-    }
-    if len(departamentos) == 0:
-        return {"_status": "Error, el código del departamento no existe"}
-
-    for departamento in departamentos:
-        departamentosArray["depas"].append(
-            {
-                "Código": departamento[1],
-                "Descripción": departamento[2]
-            }
-        )
-
-    return departamentosArray
+    # Se envía los parametros que recoge el endpoint y lo envía al dispatcher
+    response = dispatcher.model(payload)
+    # Validación de la respuesta
+    return response
 
 
-@app.route('/provincia', methods=['POST'])
-def getProvinceByIdDepartment():
-    payload = loads(request.data.decode('utf8').replace("'", '"'))
-
-    if payload["valor"] == "":
-        return {"_status": "Error, debe mandar el código del departamento"}
-
-    query = f'select id_provincia, cod_provincia, des_provincia from provincia where cod_departamento = "{payload["valor"]}";'
-    cur = config.db.cursor()
-    cur.execute(query)
-    provincias = cur.fetchall()
-    provinciasArray = {
-        "provincias": []
-    }
-    if len(provincias) == 0:
-        return {"_status": "Error, el código del departamento no existe "}
-
-    for provincia in provincias:
-        provinciasArray['provincias'].append(
-            {
-                "Código": provincia[1],
-                "Descripción": provincia[2]
-            }
-        )
-
-    return provinciasArray
+@app.route('/busquedaespecialista', methods=['POST'])
+def busquedaespecialista():
+    return "ok"
 
 
 if __name__ == '__main__':

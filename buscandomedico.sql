@@ -99,9 +99,9 @@ CREATE TABLE paciente
 CREATE TABLE medico
 ( 
 	id_medico            integer PRIMARY KEY AUTO_INCREMENT ,
-	id_distrito          integer  NOT NULL ,
-	id_provincia         integer  NOT NULL ,
-	id_departamento      integer  NOT NULL ,
+	cod_distrito         varchar(10) NOT NULL ,
+	cod_provincia        varchar(10) NOT NULL ,
+	cod_departamento     varchar(10) NOT NULL ,
 	id_prospecto         integer  NOT NULL ,
 	nombres              varchar(100)  NOT NULL ,
 	ape_paterno          varchar(100)  NOT NULL ,
@@ -137,11 +137,11 @@ CREATE TABLE comentarios
 
 CREATE TABLE consultorio
 ( 
-	id_consultorio        integer PRIMARY KEY AUTO_INCREMENT ,
+	id_consultorio       integer PRIMARY KEY AUTO_INCREMENT ,
 	id_medico            integer  NOT NULL ,
-	id_distrito          integer  NOT NULL ,
-	id_provincia         integer  NOT NULL ,
-	id_departamento      integer  NOT NULL ,
+	cod_distrito         varchar(10) NOT NULL ,
+	cod_provincia        varchar(10) NOT NULL ,
+	cod_departamento     varchar(10) NOT NULL ,
 	des_direccion        varchar(100)  NULL ,
 	fec_creacion         datetime NOT NULL ,
 	fec_modificacion     datetime DEFAULT NULL ,
