@@ -29,7 +29,9 @@ def getUbigeoByCod():
 
 @app.route('/busquedaespecialista', methods=['POST'])
 def busquedaespecialista():
-    return "ok"
+    payload = loads(request.data.decode('utf8').replace("'", '"'))
+    response = dispatcher.model(payload)
+    return response
 
 
 if __name__ == '__main__':
