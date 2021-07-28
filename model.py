@@ -62,20 +62,20 @@ class Dispatcher:
             self.cur.execute(query)
             medicos = self.cur.fetchall()
             medicosDict = {
-                "medicosArray": []
+                'medicosArray': []
             }
 
-            if len(medicos) == 0:
-                return {'_status': self.information['error_exists'].format(parameters['table'])}
+            if len(medicos) > 7:
+                return {'_status': self.information['error_exists'].format(parameters['type'])}
             
             for medico in medicos:
                 medicosDict['medicosArray'].append(
                     {
-                        'id_medico': medico[0],
+                        'id_medico': int(medico[0]),
                         'nombre_completo': medico[1] + ' ' + medico[2] + ' ' + medico[3],
                         'codigo_colegiado': medico[8],
                         'descripcion': medico[9],
-                        'promedio_puntaje': medico[13]
+                        'promedio_puntaje': float(medico[13])
                     }
                 )
 
