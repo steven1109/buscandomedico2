@@ -14,6 +14,11 @@ class Dispatcher:
             'provincia': 'cod_provincia,des_provincia',
             'distrito': 'cod_distrito,des_distrito'
         }
+        self.query_fields = {
+            'departamento': 'cod_departamento',
+            'provincia': 'cod_departamento',
+            'distrito': 'cod_provincia'
+        }
 
     def model(self, parameters):
         condition = ''
@@ -67,7 +72,7 @@ class Dispatcher:
 
             if len(medicos) > 7:
                 return {'_status': self.information['error_exists'].format(parameters['type'])}
-            
+
             for medico in medicos:
                 medicosDict['medicosArray'].append(
                     {
