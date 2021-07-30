@@ -1,8 +1,12 @@
-from regions.domain.model_departamento import Departamento
+from regions.dispatcher_regions import Dispatcher
 
-departamento = Departamento()
 
-departamento.set_cod_departamento("14")
-departamento.set_des_departamento("Lima")
+connection = "colocar la cadena de conexion"
+parameters = {
+    'type': 'departamento',
+    'value': '05'
+}
 
-print(departamento.get_cod_departamento() + " -- " + departamento.get_des_departamento())
+dispatcher = Dispatcher(connection=connection, parameters=parameters)
+
+

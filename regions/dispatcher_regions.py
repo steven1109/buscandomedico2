@@ -1,13 +1,14 @@
 import os
-import controller.ct_departamento
+from controller.ct_departamento import DepartamentoController
 import controller.ct_provincia
 import controller.ct_distrito
 
 
 class Dispatcher:
     def __init__(self, connection):
-        self.connection = connection
-        self.action = {}
+        self.dispatcher = DepartamentoController(connection)
+        self.param = ""
         
-    def model(self):
-        return "ok"
+    def execute(self, parameters):
+        self.param = parameters
+        return self.dispatcher.controller(self.param)
