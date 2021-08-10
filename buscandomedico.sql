@@ -98,31 +98,30 @@ CREATE TABLE paciente
 
 CREATE TABLE medico
 ( 
-	id_medico            integer PRIMARY KEY AUTO_INCREMENT ,
-	cod_distrito         varchar(10) NOT NULL ,
-	cod_provincia        varchar(10) NOT NULL ,
-	cod_departamento     varchar(10) NOT NULL ,
-	id_prospecto         integer  NOT NULL ,
-	nombres              varchar(100)  NOT NULL ,
-	ape_paterno          varchar(100)  NOT NULL ,
-	ape_materno          varchar(100)  NOT NULL ,
-	fec_nacimiento       datetime  NOT NULL ,
-	genero               integer  NOT NULL ,
-	codigo_cmp           varchar(20)  NOT NULL ,
-	flag_atiende_covid   integer  NOT NULL ,
-	flag_Atiende_vih     integer  NOT NULL ,
-	flag_atiende_videollamada integer  NOT NULL ,
-	fec_creacion         datetime  NOT NULL ,
-	fec_modificacion     datetime DEFAULT NULL ,
-	comentario_personal  varchar(500)  NOT NULL ,
-	facebook             varchar(100)  DEFAULT NULL ,
-	instagram            varchar(100)  DEFAULT NULL ,
-	twitter              varchar(100)  DEFAULT NULL ,
-	linkedin             varchar(100)  DEFAULT NULL 
+	id_medico					integer PRIMARY KEY AUTO_INCREMENT ,
+	cod_distrito				varchar(10) NOT NULL ,
+	cod_provincia				varchar(10) NOT NULL ,
+	cod_departamento			varchar(10) NOT NULL ,
+	id_prospecto				integer  NOT NULL ,
+	nombres              		varchar(100)  NOT NULL ,
+	ape_paterno          		varchar(100)  NOT NULL ,
+	ape_materno          		varchar(100)  NOT NULL ,
+	fec_nacimiento       		datetime  NOT NULL ,
+	genero               		integer  NOT NULL ,
+	codigo_cmp           		varchar(20)  NOT NULL ,
+	flag_atiende_covid   		integer  NOT NULL ,
+	flag_Atiende_vih     		integer  NOT NULL ,
+	flag_atiende_videollamada	integer  NOT NULL ,
+	comentario_personal			varchar(500)  NOT NULL ,
+	facebook             		varchar(100)  DEFAULT NULL ,
+	instagram            		varchar(100)  DEFAULT NULL ,
+	twitter              		varchar(100)  DEFAULT NULL ,
+	linkedin             		varchar(100)  DEFAULT NULL,
+	bol_activo			 		boolean NOT NULL , --- campo nuevo agregado, falta aumentar en la db y hacer un insert
+	fec_creacion         		datetime  NOT NULL ,
+	fec_modificacion     		datetime DEFAULT NULL ,
 );
 
-
---------------------------------------------------------------
 
 CREATE TABLE comentarios
 ( 
@@ -252,4 +251,24 @@ CREATE TABLE medio_pago
 	desc_medio_pago	     varchar(50) not NULL ,
 	fec_creacion         datetime not null ,
 	fec_modificacion     datetime DEFAULT NULL
+);
+
+CREATE TABLE perfil_usuario
+(
+	id_perfil_usuario 	INT PRIMARY KEY auto_increment,
+	des_perfil_usuario	varchar(20) not null,
+	num_vigente			integer NOT NULL ,
+	fec_creacion        datetime not null ,
+	fec_modificacion    datetime DEFAULT NULL
+);
+
+CREATE TABLE usuario
+(
+    id_usuarios         integer PRIMARY KEY AUTO_INCREMENT,
+    id_medico           integer NOT null,
+	id_perfil_usuario	integer NOT NULL ,
+    des_correo          varchar(50) not null,
+    des_pass            varchar(255) not null,
+    fec_creacion        datetime NOT  NULL ,
+	fec_modificacion    datetime  default NULL
 );

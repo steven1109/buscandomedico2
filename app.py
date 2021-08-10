@@ -1,4 +1,4 @@
-from flask import Flask, request #, jsonify, make_response, render_template
+from flask import Flask, request  # , jsonify, make_response, render_template
 from config import Config
 from datetime import datetime
 from json import loads
@@ -28,6 +28,7 @@ def getUbigeoByCod():
 
 
 @app.route('/busquedaespecialista', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def busquedaespecialista():
     payload = loads(request.data.decode('utf8').replace("'", '"'))
     response = dispatcher.model(payload)

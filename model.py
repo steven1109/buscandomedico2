@@ -111,3 +111,10 @@ class Dispatcher:
                 )
 
             return medicosDict
+
+        elif parameters['type'] == 'Login':
+            json = {
+                'status': 'ok'
+            }
+            
+            return json
