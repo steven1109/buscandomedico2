@@ -18,18 +18,18 @@ connection = mysql.connector.connect(host=config.MYSQL_HOST,
 dispatcher = Dispatcher(connection)
 
 
+# @app.route('/ubigeo', methods=['POST'])
+# def getUbigeoByCod():
+#     payload = loads(request.data.decode('utf8').replace("'", '"'))
+#     # Se envía los parametros que recoge el endpoint y lo envía al dispatcher
+#     response = dispatcher.model(payload)
+#     # Validación de la respuesta
+#     return response
+
 @app.route('/ubigeo', methods=['POST'])
-def getUbigeoByCod():
-    payload = loads(request.data.decode('utf8').replace("'", '"'))
-    # Se envía los parametros que recoge el endpoint y lo envía al dispatcher
-    response = dispatcher.model(payload)
-    # Validación de la respuesta
-    return response
-
-
 @app.route('/busquedaespecialista', methods=['POST'])
 @app.route('/login', methods=['POST'])
-def busquedaespecialista():
+def endpointBuscandomedico():
     payload = loads(request.data.decode('utf8').replace("'", '"'))
     response = dispatcher.model(payload)
     return response
