@@ -119,7 +119,7 @@ CREATE TABLE medico
 	linkedin             		varchar(100)  DEFAULT NULL,
 	bol_activo			 		boolean NOT NULL , --- campo nuevo agregado, falta aumentar en la db y hacer un insert
 	fec_creacion         		datetime  NOT NULL ,
-	fec_modificacion     		datetime DEFAULT NULL ,
+	fec_modificacion     		datetime DEFAULT NULL
 );
 
 

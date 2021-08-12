@@ -1,4 +1,4 @@
-from flask import Flask, request  # , jsonify, make_response, render_template
+from flask import Flask, request, render_template  # , jsonify, make_response
 from config import Config
 from datetime import datetime
 from json import loads
@@ -18,13 +18,10 @@ connection = mysql.connector.connect(host=config.MYSQL_HOST,
 dispatcher = Dispatcher(connection)
 
 
-# @app.route('/ubigeo', methods=['POST'])
-# def getUbigeoByCod():
-#     payload = loads(request.data.decode('utf8').replace("'", '"'))
-#     # Se envía los parametros que recoge el endpoint y lo envía al dispatcher
-#     response = dispatcher.model(payload)
-#     # Validación de la respuesta
-#     return response
+@app.route('/')
+def principal():
+    return render_template('ejemploToAWS/index.html')
+
 
 @app.route('/ubigeo', methods=['POST'])
 @app.route('/busquedaespecialista', methods=['POST'])

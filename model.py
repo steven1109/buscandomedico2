@@ -1,4 +1,6 @@
 import unicodedata
+from cryptography.fernet import Fernet
+from config import Config
 
 
 class Dispatcher:
@@ -22,29 +24,35 @@ class Dispatcher:
         }
 
     def model(self, parameters):
-        condition = ''
         if parameters['type'] == 'Ubigeo':
+            condition = ''
+            try:
+                if parameters['value'] == "" and parameters['table'] != 'departamento':
+                    return {"_status": self.information['error_blank']}
 
-            if parameters['value'] == "" and parameters['table'] != 'departamento':
-                return {"_status": self.information['error_blank']}
+                if parameters['value'] != '' and parameters['field'] != '':
+                    condition = f'where {parameters["field"]} = "{parameters["value"]}";'
 
-            if parameters['value'] != '' and parameters['field'] != '':
-                condition = f'where {parameters["field"]} = "{parameters["value"]}";'
+                query = f'select {self.fields_ubigeos[parameters["table"]]} from {parameters["table"]} {condition}'
+                ubigeos = self.executeQuery(query)
 
-            query = f'select {self.fields_ubigeos[parameters["table"]]} from {parameters["table"]} {condition}'
+                if len(ubigeos) == 0:
+                    return {'_status': self.information['error_exists'].format(parameters['table'])}
 
-            ubigeos = self.executeQuery(query)
-            if len(ubigeos) == 0:
-                return {'_status': self.information['error_exists'].format(parameters['table'])}
+                response = {'ubigeosArray': list(
+                    map(lambda ubigeo: {'codi': ubigeo[0], 'description': ubigeo[1]}, ubigeos))}
 
-            response = {'ubigeosArray': list(
-                map(lambda ubigeo: {'codi': ubigeo[0], 'description': ubigeo[1]}, ubigeos))}
+                return response
 
-            return response
+            except Exception as e:
+                return {
+                    'message': 'Error en la ejecución de la consulta, ' + str(e),
+                    'status': False
+                }
 
         elif parameters['type'] == 'Medico':
             # Filtros
-            clausulas = ""
+            clausulas = ''
             try:
                 if parameters['genero'] != "":
                     clausulas += ' AND me.genero = {}'.format(
@@ -77,7 +85,7 @@ class Dispatcher:
                     ' inner join especialidad_medico esme on me.id_medico = esme.id_medico ' \
                     ' inner join especialidad es on esme.id_especialidad = es.id_especialidad ' \
                     ' left join comentarios com on me.id_medico = com.id_medico ' \
-                    ' where es.bol_activo = 1 {} ' \
+                    ' where me.bol_activo = 1 {} ' \
                     ' group by me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
                     ' me.codigo_cmp,me.comentario_personal,es.des_especialidad ' \
                     ' order by me.ape_materno;'.format(clausulas)
@@ -105,12 +113,52 @@ class Dispatcher:
                 }
 
         elif parameters['type'] == 'Login':
-            response = {
-                'status': 'ok'
-            }
+            
+            try:
+                i = 0
+                perfil = ""
+                query = 'select us.id_usuarios,us.id_medico,us.id_perfil_usuario,pu.des_perfil_usuario,us.des_correo,us.des_pass ' \
+                    ' from usuario us ' \
+                    ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario;'
+                results = self.executeQuery(query)
 
-            return response
+                for result in results:
+                    #print(result[3], result[4], self.decrypt(result[4]))
+                    if parameters['user'] == result[4] and self.decrypt(result[5]) == parameters['pass']:
+                        i += 1
+                        perfil = result[3]
+                        break
+
+                if i == 1:
+                    response = {
+                        '_status': 'ok',
+                        'perfil': perfil
+                    }
+
+                else:
+                    response = {
+                        '_status': 'error',
+                        'result': 'El usuario o la contraseña ingresada es incorrecta.'
+                    }
+
+                return response
+            
+            except Exception as e:
+                return {
+                    'message': 'Error en la ejecución de la consulta, ' + str(e),
+                    '_status': False
+                }
 
     def executeQuery(self, query):
         self.cur.execute(query)
         return self.cur.fetchall()
+
+    def decrypt(self, encMessage):
+        key = Config.TOKEN.encode()  # Fernet.generate_key()
+        fernet = Fernet(key)
+        return fernet.decrypt(encMessage.encode()).decode()
+
+    def encrypted(self, message):
+        key = Config.TOKEN.encode()  # Fernet.generate_key()
+        fernet = Fernet(key)
+        return fernet.encrypt(message.encode())

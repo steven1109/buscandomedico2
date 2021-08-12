@@ -14,3 +14,4 @@ class Config:
     MYSQL_HOST = os.getenv("MYSQL_HOST_AWS")
     MYSQL_USER = os.getenv("MYSQL_USER_AWS")
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD_AWS")
+    TOKEN = os.getenv("token")
