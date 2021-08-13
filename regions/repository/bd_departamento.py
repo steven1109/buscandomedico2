@@ -1,20 +1,21 @@
 import os
+from logging import getLogger
+log = getLogger(__name__)
 
 
 class DepartamentoRepository:
     # TODO:
     # Definición de todos los eventos que se hará a la tabla departamento.
+    def __init__(self, cursor):
+        self.query_find = 'SELECT cod_departamento,des_departamento FROM departamento '
+        self.cursor = cursor
 
-    def __init__(self, conn):
-        self.query_find = "SELECT * FROM departamento {}"
-        self.cursor = conn.cursor()
-
-    def findDepartamentoByCod(self, codigo):
-        self.cursor.execute(self.query_find.format(
-            f' where cod_departamento = "{codigo}";'))
+    def findByCod(self, codigo):
+        self.cursor.execute(self.query_find +
+                             f' where cod_departamento = "{codigo}";')
         return self.cursor.fetchall()
 
-    def findAllDepartamentos(self):
+    def findAll(self):
         self.cursor.execute(self.query_find)
         return self.cursor.fetchall()
 
