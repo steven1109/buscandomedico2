@@ -1,6 +1,7 @@
 import unicodedata
 from cryptography.fernet import Fernet
 from config import Config
+from datetime import datetime
 
 
 class Dispatcher:
@@ -28,7 +29,10 @@ class Dispatcher:
             condition = ''
             try:
                 if parameters['value'] == "" and parameters['table'] != 'departamento':
-                    return {"_status": self.information['error_blank']}
+                    return {
+                        '_status': 0,
+                        'message': self.information['error_blank']
+                    }
 
                 if parameters['value'] != '' and parameters['field'] != '':
                     condition = f'where {parameters["field"]} = "{parameters["value"]}";'
@@ -37,17 +41,24 @@ class Dispatcher:
                 ubigeos = self.executeQuery(query)
 
                 if len(ubigeos) == 0:
-                    return {'_status': self.information['error_exists'].format(parameters['table'])}
+                    return {
+                        '_status': 0,
+                        'message': self.information['error_exists'].format(parameters['table']),
+                        'ubigeosArray': []
+                    }
 
-                response = {'ubigeosArray': list(
-                    map(lambda ubigeo: {'codi': ubigeo[0], 'description': ubigeo[1]}, ubigeos))}
+                response = {
+                    '_status': 1,
+                    'ubigeosArray': list(
+                        map(lambda ubigeo: {'codi': ubigeo[0], 'description': ubigeo[1]}, ubigeos))
+                }
 
                 return response
 
             except Exception as e:
                 return {
-                    'message': 'Error en la ejecución de la consulta, ' + str(e),
-                    'status': False
+                    '_status': 0,
+                    'message': 'Error en la ejecución de la consulta, ' + str(e)
                 }
 
         elif parameters['type'] == 'Medico':
@@ -93,60 +104,77 @@ class Dispatcher:
                 medicos = self.executeQuery(query)
 
                 if len(medicos) == 0:
-                    return {'_status': self.information['err_medico']}
+                    return {
+                        '_status': 0,
+                        'message': self.information['err_medico'],
+                        'medicosArray': []
+                    }
 
-                response = {'medicosArray': list(
-                    map(lambda medico: {
-                        'id_medico': int(medico[0]),
-                        'nombre_completo': medico[1] + ' ' + medico[2] + ' ' + medico[3],
-                        'codigo_colegiado': medico[8],
-                        'descripcion': medico[9],
-                        'promedio_puntaje': float(medico[13])
-                    }, medicos))}
+                response = {
+                    '_status': 1,
+                    'medicosArray': list(
+                        map(lambda medico: {
+                            'id_medico': int(medico[0]),
+                            'nombre_completo': medico[1] + ' ' + medico[2] + ' ' + medico[3],
+                            'codigo_colegiado': medico[8],
+                            'descripcion': medico[9],
+                            'promedio_puntaje': float(medico[13])
+                        }, medicos))}
 
                 return response
 
             except Exception as e:
                 return {
+                    '_status': 0,
                     'message': 'Error en la ejecución de la consulta, ' + str(e),
-                    'status': False
                 }
 
         elif parameters['type'] == 'Login':
-            
+
             try:
                 i = 0
-                perfil = ""
-                query = 'select us.id_usuarios,us.id_medico,us.id_perfil_usuario,pu.des_perfil_usuario,us.des_correo,us.des_pass ' \
+                query = ' select us.id_medico,pu.des_perfil_usuario,us.des_correo,us.des_pass, ' \
+                    ' me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.fec_nacimiento,me.codigo_cmp,es.id_especialidad, ' \
+                    ' es.des_especialidad,esme.codigo_rne ' \
                     ' from usuario us ' \
-                    ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario;'
+                    ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
+                    ' left join medico me on us.id_medico = me.id_medico ' \
+                    ' left join especialidad_medico esme on me.id_medico = esme.id_medico ' \
+                    ' left join especialidad es on esme.id_especialidad = es.id_especialidad;'
                 results = self.executeQuery(query)
 
                 for result in results:
-                    #print(result[3], result[4], self.decrypt(result[4]))
-                    if parameters['user'] == result[4] and self.decrypt(result[5]) == parameters['pass']:
+                    if parameters['user'] == result[2] and self.decrypt(result[3]) == parameters['pass']:
                         i += 1
-                        perfil = result[3]
+                        response = {
+                            '_status': 1,
+                            'perfil': result[1],
+                            'welcome': ('Dra. ' if result[7] == 1 else 'Dr. ') +
+                            result[4] + ', ' + result[5] + ' ' + result[6],
+                            'nombre': result[4],
+                            'ape_paterno': result[5],
+                            'ape_materno': result[6],
+                            'fec_nacimiento': str(result[8]), # datetime.strptime(str(result[8]), '%yyyy-%m-%d'),
+                            'cmp': result[9],
+                            'genero': result[7],
+                            'id_especialidad': result[10],
+                            'des_especialidad': result[11],
+                            'rme': result[12]
+                        }
                         break
 
-                if i == 1:
+                if i == 0:
                     response = {
-                        '_status': 'ok',
-                        'perfil': perfil
-                    }
-
-                else:
-                    response = {
-                        '_status': 'error',
+                        '_status': 0,
                         'result': 'El usuario o la contraseña ingresada es incorrecta.'
                     }
 
                 return response
-            
+
             except Exception as e:
                 return {
-                    'message': 'Error en la ejecución de la consulta, ' + str(e),
-                    '_status': False
+                    '_status': 0,
+                    'message': 'Error en la ejecución de la consulta, ' + str(e)
                 }
 
     def executeQuery(self, query):

@@ -1,4 +1,3 @@
-import os
 from regions.controller.ct_departamento import DepartamentoController
 from regions.controller.ct_provincia import ProvinciaController
 from regions.controller.ct_distrito import DistritoController
@@ -7,7 +6,6 @@ from regions.controller.ct_distrito import DistritoController
 class Dispatcher:
     def __init__(self, connection):
         self.connection = connection
-        self.dispatcher = DepartamentoController(connection)
         self.param = ""
 
     def execute(self, parameters):
@@ -25,11 +23,13 @@ class Dispatcher:
             return self.response(data)
 
     def response(self, data):
-        return {'ubigeosArray': list(
-            map(lambda ubigeo: {'codi': str(ubigeo[0]), 'description': ubigeo[1]}, data))}
-        
+        return {'_status': 1,
+                'ubigeosArray': list(
+                    map(lambda ubigeo: {'codi': str(ubigeo[0]), 'description': ubigeo[1]}, data))}
+
     def error_result(self):
         return {
-            '_status': False,
+            '_status': 0,
+            'ubigeosArray': [],
             'message': 'Lo sentimos, no hay resultado para esta busqueda'
         }
