@@ -15,17 +15,17 @@ connection = mysql.connector.connect(host=config.MYSQL_HOST,
                                      user=config.MYSQL_USER,
                                      password=config.MYSQL_PASSWORD)
 
-dispatcher = Dispatcher(connection)
+dispatcher = Dispatcher()
 
 
-@app.route('/')
-def principal():
-    return render_template('ejemploToAWS/index.html')
+# @app.route('/')
+# def principal():
+#     return render_template('ejemploToAWS/index.html')
 
 
-@app.route('/ubigeo', methods=['POST'])
-@app.route('/busquedaespecialista', methods=['POST'])
-@app.route('/login', methods=['POST'])
+@app.route('api/ubigeo', methods=['POST'])
+@app.route('api/busquedaespecialista', methods=['POST'])
+@app.route('api/login', methods=['POST'])
 def endpointBuscandomedico():
     payload = loads(request.data.decode('utf8').replace("'", '"'))
     response = dispatcher.model(payload)

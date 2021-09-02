@@ -2,12 +2,14 @@ import unicodedata
 from cryptography.fernet import Fernet
 from config import Config
 from datetime import datetime
+from config import DBMySql as mydb
 
+mydb.initialize()
 
 class Dispatcher:
-    def __init__(self, connection):
-        self.connection = connection
-        self.cur = connection.cursor()
+    def __init__(self):
+        self.conn = self.conn.connection
+        self.cur = self.conn.cursor()
         self.information = {
             'error_exists': 'Error, el código no existe en la tabla {}',
             'error_blank': 'Error, debe enviar un código para la consulta',
