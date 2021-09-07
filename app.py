@@ -23,9 +23,10 @@ dispatcher = Dispatcher()
 #     return render_template('ejemploToAWS/index.html')
 
 
-@app.route('api/ubigeo', methods=['POST'])
-@app.route('api/busquedaespecialista', methods=['POST'])
-@app.route('api/login', methods=['POST'])
+@app.route('/api/ubigeo', methods=['POST'])
+@app.route('/api/busquedaespecialista', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
+@app.route('/api/endpoints', methods=['POST'])
 def endpointBuscandomedico():
     payload = loads(request.data.decode('utf8').replace("'", '"'))
     response = dispatcher.model(payload)

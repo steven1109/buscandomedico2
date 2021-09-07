@@ -26,13 +26,12 @@ class DBMySql:
 
     def initialize(self):
         self.config = Config()
-        self.connect()
 
     def connect(self):
-        self.connection = mysql.connector.connect(host=self.config.MYSQL_HOST,
+       return mysql.connector.connect(host=self.config.MYSQL_HOST,
                                                   database=self.config.MYSQL_DB,
                                                   user=self.config.MYSQL_USER,
                                                   password=self.config.MYSQL_PASSWORD)
 
     def close(self):
-        self.connection.close()
+        mysql.connector.close()

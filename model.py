@@ -2,13 +2,14 @@ import unicodedata
 from cryptography.fernet import Fernet
 from config import Config
 from datetime import datetime
-from config import DBMySql as mydb
+from config import DBMySql
 
-mydb.initialize()
 
 class Dispatcher:
     def __init__(self):
-        self.conn = self.conn.connection
+        self.mydb = DBMySql()
+        self.mydb.initialize()
+        self.conn = self.mydb.connect()
         self.cur = self.conn.cursor()
         self.information = {
             'error_exists': 'Error, el código no existe en la tabla {}',
@@ -54,7 +55,7 @@ class Dispatcher:
                     'ubigeosArray': list(
                         map(lambda ubigeo: {'codi': ubigeo[0], 'description': ubigeo[1]}, ubigeos))
                 }
-
+                self.conn.cursor().close()
                 return response
 
             except Exception as e:
@@ -123,6 +124,7 @@ class Dispatcher:
                             'promedio_puntaje': float(medico[13])
                         }, medicos))}
 
+                self.conn.cursor().close()
                 return response
 
             except Exception as e:
@@ -132,7 +134,6 @@ class Dispatcher:
                 }
 
         elif parameters['type'] == 'Login':
-
             try:
                 i = 0
                 query = ' select us.id_medico,pu.des_perfil_usuario,us.des_correo,us.des_pass, ' \
@@ -156,7 +157,7 @@ class Dispatcher:
                             'nombre': result[4],
                             'ape_paterno': result[5],
                             'ape_materno': result[6],
-                            'fec_nacimiento': str(result[8]), # datetime.strptime(str(result[8]), '%yyyy-%m-%d'),
+                            'fec_nacimiento': str(result[8]),
                             'cmp': result[9],
                             'genero': result[7],
                             'id_especialidad': result[10],
@@ -171,6 +172,7 @@ class Dispatcher:
                         'result': 'El usuario o la contraseña ingresada es incorrecta.'
                     }
 
+                self.conn.cursor().close()
                 return response
 
             except Exception as e:
