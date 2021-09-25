@@ -109,6 +109,7 @@ CREATE TABLE medico
 	fec_nacimiento       		datetime  NOT NULL ,
 	genero               		integer  NOT NULL ,
 	codigo_cmp           		varchar(20)  NOT NULL ,
+    fec_colegiado				datetime DEFAULT NULL,
 	flag_atiende_covid   		integer  NOT NULL ,
 	flag_Atiende_vih     		integer  NOT NULL ,
 	flag_atiende_videollamada	integer  NOT NULL ,

@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template  # , jsonify, make_response
+import re
+from flask import Flask, request, render_template, make_response, jsonify
 from config import Config
 from datetime import datetime
 from json import loads
@@ -18,11 +19,6 @@ connection = mysql.connector.connect(host=config.MYSQL_HOST,
 dispatcher = Dispatcher()
 
 
-# @app.route('/')
-# def principal():
-#     return render_template('ejemploToAWS/index.html')
-
-
 @app.route('/api/ubigeo', methods=['POST'])
 @app.route('/api/busquedaespecialista', methods=['POST'])
 @app.route('/api/login', methods=['POST'])
@@ -30,6 +26,20 @@ dispatcher = Dispatcher()
 def endpointBuscandomedico():
     payload = loads(request.data.decode('utf8').replace("'", '"'))
     response = dispatcher.model(payload)
+    return response
+
+
+@app.route('/api/add', methods=['GET'])
+def adding_record():
+    payload = loads(request.data.decode('utf8').replace("'", '"'))
+
+    key = request.headers.get("Authorization", "Fail")
+    if key == "7AB8D23CA175610278D73DC419AA786D150C58EC9C80CCB4EB6FF5395246B640":
+        if request.method == 'GET':
+            response = dispatcher.add_row(payload)
+    else:
+        response = make_response(
+            jsonify(response="Unauthorized", status=401), 401)
     return response
 
 

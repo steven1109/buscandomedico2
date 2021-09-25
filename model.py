@@ -181,6 +181,54 @@ class Dispatcher:
                     'message': 'Error en la ejecución de la consulta, ' + str(e)
                 }
 
+    def add_row(self, parameters):
+        try:
+            if parameters['codi'] == "":
+                return {
+                    '_status': 0,
+                    'message': self.information['error_blank']
+                }
+
+            cod_departamento = ''
+            cod_provincia = ''
+            cod_distrito = ''
+            id_prospecto = ''
+            nombres = ''
+            ape_paterno = ''
+            ape_materno = ''
+            fec_nacimiento = ''
+            genero = ''
+            codigo_cmp = ''
+            atiende_covid = ''
+            atiende_vih = ''
+            videollamada = ''
+            descripcion_profesional = ''
+            facebook = ''
+            instagram = ''
+            linkedin = ''
+            fec_colegiatura = ''
+            activo = 1
+            creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            query = ' INSERT INTO medico (cod_test, fec_creacion)  ' \
+                    ' VALUES(%s, %s) '
+
+            values = (cod_departamento, cod_provincia, cod_distrito, id_prospecto, nombres, ape_paterno, ape_materno, fec_nacimiento,
+                      genero, codigo_cmp, atiende_covid, atiende_vih, videollamada, descripcion_profesional, facebook, instagram,
+                      linkedin, fec_colegiatura, activo, creation_date)
+
+            self.cur.execute(query, values)
+            self.conn.commit()
+            return {
+                '_status': 200,
+                'message': "Se ha registrado de manera correcta al medico"
+            }
+        except Exception as e:
+            return {
+                '_status': 0,
+                'message': 'Error en la ejecución de la inserción, ' + str(e)
+            }
+
     def executeQuery(self, query):
         self.cur.execute(query)
         return self.cur.fetchall()
