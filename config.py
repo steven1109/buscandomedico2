@@ -20,7 +20,6 @@ class Config:
 
 
 class DBMySql:
-
     def __init__(self):
         self.config = None
         self.connection = None
