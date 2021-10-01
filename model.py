@@ -183,39 +183,42 @@ class Dispatcher:
 
     def add_row(self, parameters):
         try:
-            if parameters['codi'] == "":
+            if parameters['cod_departamento'] == "":
                 return {
                     '_status': 0,
                     'message': self.information['error_blank']
                 }
 
-            cod_departamento = ''
-            cod_provincia = ''
-            cod_distrito = ''
-            id_prospecto = ''
-            nombres = ''
-            ape_paterno = ''
-            ape_materno = ''
-            fec_nacimiento = ''
-            genero = ''
-            codigo_cmp = ''
-            atiende_covid = ''
-            atiende_vih = ''
-            videollamada = ''
-            descripcion_profesional = ''
-            facebook = ''
-            instagram = ''
-            linkedin = ''
-            fec_colegiatura = ''
+            cod_departamento = parameters['cod_departamento']
+            cod_provincia = parameters['cod_provincia']
+            cod_distrito = parameters['cod_distrito']
+            id_prospecto = parameters['id_prospecto']
+            nombres = parameters['nombres']
+            ape_paterno = parameters['ape_paterno']
+            ape_materno = parameters['ape_materno']
+            fec_nacimiento = parameters['fec_nacimiento']
+            genero = parameters['genero']
+            codigo_cmp = parameters['codigo_cmp']
+            atiende_covid = 0 if int(parameters['atiende_covid']) == 0 else int(parameters['atiende_covid'])
+            atiende_vih = 0 if int(parameters['atiende_vih']) == 0 else int(parameters['atiende_vih'])
+            videollamada = 0 if int(parameters['videollamada']) == 0 else int(parameters['videollamada'])
+            descripcion_profesional = parameters['descripcion_profesional']
+            facebook = parameters['facebook']
+            instagram = parameters['instagram']
+            twitter = parameters['twitter']
+            linkedin = parameters['linkedin']
+            fec_colegiatura = parameters['fec_colegiatura']
             activo = 1
             creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            query = ' INSERT INTO medico (cod_test, fec_creacion)  ' \
-                    ' VALUES(%s, %s) '
+            query = ' INSERT INTO medico (cod_departamento,cod_provincia,cod_distrito,id_prospecto,nombres,ape_paterno,ape_materno,fec_nacimiento, ' \
+                ' genero,codigo_cmp,fec_colegiatura,flag_atiende_covid,flag_Atiende_vih,flag_atiende_videollamada,comentario_personal,facebook, ' \
+                ' instagram,twitter,linkedin,bol_activo,fec_creacion)  ' \
+                ' VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) '
 
             values = (cod_departamento, cod_provincia, cod_distrito, id_prospecto, nombres, ape_paterno, ape_materno, fec_nacimiento,
-                      genero, codigo_cmp, atiende_covid, atiende_vih, videollamada, descripcion_profesional, facebook, instagram,
-                      linkedin, fec_colegiatura, activo, creation_date)
+                      genero, codigo_cmp, fec_colegiatura, atiende_covid, atiende_vih, videollamada, descripcion_profesional, facebook, instagram,
+                      twitter, linkedin, activo, creation_date)
 
             self.cur.execute(query, values)
             self.conn.commit()
