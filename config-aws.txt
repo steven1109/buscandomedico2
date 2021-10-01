@@ -1,0 +1,68 @@
+
+MYSQL_USER_AWS=medicosadmin
+MYSQL_PASSWORD_AWS=mySqlFlaskPlbmeP6
+
+
+$ sudo apt-get install nginx
+$ cd /etc/nginx/sites-enabled/
+$ sudo vim flaskapp
+
+server {
+    listen 80;
+    root /home/ubuntu/webmedicos/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api {
+        include proxy_params;
+        #proxy_pass http://localhost:8000;
+        proxy_pass http://unix:/home/ubuntu/webmedicos/api/webmedicos.sock;
+    }
+}
+
+$ sudo service nginx restart
+$ sudo service nginx status
+$ sudo service nginx start
+$ sudo service nginx stop
+
+
+Configuración Gunicorn3:
+$ sudo apt-get install gunicorn3
+$ cd /etc/systemd/system/
+$ sudo vim gunicorn3.service
+
+[Unit]
+Description=Gunicorn instance to serve myproject
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/webmedicos/api
+ExecStart=gunicorn3 --workers 3 --bind unix:webmedicos.sock -m 007 app:app
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+$ sudo systemctl daemon-reload
+$ sudo service gunicorn3 start
+$ sudo service gunicorn3 status
+$ sudo service gunicorn3 restart
+$ sudo service gunicorn3 stop
+
+mkdir webmedicos
+mkdir api dist
+
+connect 
+$ mysql -h buscandomedicos.cpvlafhznktc.sa-east-1.rds.amazonaws.com -P 3306 -u mysqlflask -p
+
+copiar archivos de local al server
+$ scp -i webmedicos.pem -r /home/steven.jefferson.ve/Documents/practicas/buscandomedico2/config.py 
+ubuntu@ec2-54-207-73-20.sa-east-1.compute.amazonaws.com:/home/ubuntu/webmedicos/api
+
+
