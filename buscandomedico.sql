@@ -47,7 +47,7 @@ CREATE TABLE especialidad
 	des_especialidad     varchar(250)  NOT NULL ,
 	bol_activo			 boolean NOT NULL ,
 	fec_creacion         datetime  NOT NULL ,
-	fec_modificacion     datetime  defaultault NULL
+	fec_modificacion     datetime  default NULL
 );
 
 CREATE TABLE plan
