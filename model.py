@@ -151,6 +151,7 @@ class Dispatcher:
                         i += 1
                         response = {
                             '_status': 1,
+                            'id_medico': result[0],
                             'perfil': result[1],
                             'welcome': ('Dra. ' if result[7] == 1 else 'Dr. ') +
                             result[4] + ', ' + result[5] + ' ' + result[6],
@@ -181,6 +182,67 @@ class Dispatcher:
                     'message': 'Error en la ejecución de la consulta, ' + str(e)
                 }
 
+        elif parameters['type'] == 'get_medico':
+            #try:
+            i = 0
+            query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
+                ' me.codigo_cmp,me.comentario_personal,es.des_especialidad, ' \
+                ' COUNT(com.id_medico) AS count_doc,  ' \
+                ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
+                ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
+                ' from medico me ' \
+                ' inner join especialidad_medico esme on me.id_medico = esme.id_medico ' \
+                ' inner join especialidad es on esme.id_especialidad = es.id_especialidad ' \
+                ' left join comentarios com on me.id_medico = com.id_medico ' \
+                ' where me.id_medico = {} ' \
+                ' group by me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
+                ' me.codigo_cmp,me.comentario_personal,es.des_especialidad ' \
+                ' order by me.ape_materno;'.format(str(parameters['id_medico']))
+
+            print(query)
+            results = self.executeQuery(query)
+
+            if len(results) == 0:
+                return {
+                    '_status': 0,
+                    'message': self.information['err_medico'],
+                    'medicosArray': []
+                }
+
+            for result in results:
+                i += 1
+                response = {
+                    '_status': 1,
+                    'id_medico': result[0],
+                    'perfil': result[1],
+                    'welcome': ('Dra. ' if result[7] == 1 else 'Dr. ') +
+                    result[4] + ', ' + result[5] + ' ' + result[6],
+                    'nombre': result[4],
+                    'ape_paterno': result[5],
+                    'ape_materno': result[6],
+                    'fec_nacimiento': str(result[8]),
+                    'cmp': result[9],
+                    'genero': result[7],
+                    'id_especialidad': result[10],
+                    'des_especialidad': result[11],
+                    'rme': result[12]
+                }
+
+            if i == 0:
+                response = {
+                    '_status': 0,
+                    'result': 'El usuario o la contraseña ingresada es incorrecta.'
+                }
+
+            self.conn.cursor().close()
+            return response
+
+            # except Exception as e:
+            #     return {
+            #         '_status': 0,
+            #         'message': 'Error en la ejecución de la consulta, ' + str(e)
+            #     }
+
     def add_row(self, parameters):
         try:
             if parameters['cod_departamento'] == "":
@@ -199,9 +261,12 @@ class Dispatcher:
             fec_nacimiento = parameters['fec_nacimiento']
             genero = parameters['genero']
             codigo_cmp = parameters['codigo_cmp']
-            atiende_covid = 0 if int(parameters['atiende_covid']) == 0 else int(parameters['atiende_covid'])
-            atiende_vih = 0 if int(parameters['atiende_vih']) == 0 else int(parameters['atiende_vih'])
-            videollamada = 0 if int(parameters['videollamada']) == 0 else int(parameters['videollamada'])
+            atiende_covid = 0 if int(parameters['atiende_covid']) == 0 else int(
+                parameters['atiende_covid'])
+            atiende_vih = 0 if int(parameters['atiende_vih']) == 0 else int(
+                parameters['atiende_vih'])
+            videollamada = 0 if int(parameters['videollamada']) == 0 else int(
+                parameters['videollamada'])
             descripcion_profesional = parameters['descripcion_profesional']
             facebook = parameters['facebook']
             instagram = parameters['instagram']
