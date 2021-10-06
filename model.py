@@ -186,7 +186,8 @@ class Dispatcher:
             #try:
             i = 0
             query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-                ' me.codigo_cmp,me.comentario_personal,es.des_especialidad, ' \
+                ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
+                ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario, ' \
                 ' COUNT(com.id_medico) AS count_doc,  ' \
                 ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
                 ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
@@ -194,19 +195,21 @@ class Dispatcher:
                 ' inner join especialidad_medico esme on me.id_medico = esme.id_medico ' \
                 ' inner join especialidad es on esme.id_especialidad = es.id_especialidad ' \
                 ' left join comentarios com on me.id_medico = com.id_medico ' \
+                ' left join usuario us on me.id_medico = us.id_medico ' \
+                ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
                 ' where me.id_medico = {} ' \
                 ' group by me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-                ' me.codigo_cmp,me.comentario_personal,es.des_especialidad ' \
+                ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
+                ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario ' \
                 ' order by me.ape_materno;'.format(str(parameters['id_medico']))
 
-            print(query)
             results = self.executeQuery(query)
 
             if len(results) == 0:
                 return {
                     '_status': 0,
                     'message': self.information['err_medico'],
-                    'medicosArray': []
+                    'medicoArray': []
                 }
 
             for result in results:
@@ -214,24 +217,29 @@ class Dispatcher:
                 response = {
                     '_status': 1,
                     'id_medico': result[0],
-                    'perfil': result[1],
-                    'welcome': ('Dra. ' if result[7] == 1 else 'Dr. ') +
-                    result[4] + ', ' + result[5] + ' ' + result[6],
-                    'nombre': result[4],
-                    'ape_paterno': result[5],
-                    'ape_materno': result[6],
-                    'fec_nacimiento': str(result[8]),
-                    'cmp': result[9],
-                    'genero': result[7],
-                    'id_especialidad': result[10],
-                    'des_especialidad': result[11],
-                    'rme': result[12]
+                    'perfil': result[19],
+                    'welcome': ('Dra. ' if result[4] == 1 else 'Dr. ') +
+                    result[1] + ', ' + result[2] + ' ' + result[3],
+                    'nombre': result[1],
+                    'ape_paterno': result[2],
+                    'ape_materno': result[3],
+                    'fec_nacimiento': str(result[11]),
+                    'cmp': result[8],
+                    'genero': result[4],
+                    'id_especialidad': result[12],
+                    'des_especialidad': result[10],
+                    'rme': result[13],
+                    'fec_colegiatura': str(result[14]),
+                    'cod_departamento': result[15],
+                    'cod_provincia': result[16],
+                    'cod_distrito': result[17],
+                    'correo': result[18]
                 }
 
             if i == 0:
                 response = {
                     '_status': 0,
-                    'result': 'El usuario o la contraseña ingresada es incorrecta.'
+                    'result': 'El médico no existe en la DB.'
                 }
 
             self.conn.cursor().close()
@@ -297,7 +305,11 @@ class Dispatcher:
                 'message': 'Error en la ejecución de la inserción, ' + str(e)
             }
 
-    def executeQuery(self, query):
+    def executeQuery(self, query):        
+        if self.conn is False:
+            self.conn = self.mydb.connect()
+            self.cur = self.conn.cursor()
+            
         self.cur.execute(query)
         return self.cur.fetchall()
 

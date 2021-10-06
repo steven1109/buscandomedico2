@@ -1,4 +1,5 @@
-import mysql.connector
+# import mysql.connector
+import pymysql
 import os
 from dotenv import load_dotenv
 
@@ -27,10 +28,18 @@ class DBMySql:
         self.config = Config()
 
     def connect(self):
-        return mysql.connector.connect(host=self.config.MYSQL_HOST,
-                                       database=self.config.MYSQL_DB,
-                                       user=self.config.MYSQL_USER,
-                                       password=self.config.MYSQL_PASSWORD)
+        # old_connection = mysql.connector.connect(host=self.config.MYSQL_HOST,
+        #                                          database=self.config.MYSQL_DB,
+        #                                          user=self.config.MYSQL_USER,
+        #                                          password=self.config.MYSQL_PASSWORD)
+
+        new_connection = pymysql.connect(host=self.config.MYSQL_HOST,
+                                         database=self.config.MYSQL_DB,
+                                         user=self.config.MYSQL_USER,
+                                         passwd=self.config.MYSQL_PASSWORD)
+
+        return new_connection
 
     def close(self):
-        mysql.connector.close()
+        pymysql.connect.close()
+        # mysql.connector.close()
