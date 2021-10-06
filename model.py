@@ -187,7 +187,8 @@ class Dispatcher:
             i = 0
             query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
                 ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
-                ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario, ' \
+                ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
+                ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin, ' \
                 ' COUNT(com.id_medico) AS count_doc,  ' \
                 ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
                 ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
@@ -200,7 +201,8 @@ class Dispatcher:
                 ' where me.id_medico = {} ' \
                 ' group by me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
                 ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
-                ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario ' \
+                ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
+                ' me.flag_Atiende_vih,me.flag_atiende_videollamada' \
                 ' order by me.ape_materno;'.format(str(parameters['id_medico']))
 
             results = self.executeQuery(query)
@@ -233,7 +235,14 @@ class Dispatcher:
                     'cod_departamento': result[15],
                     'cod_provincia': result[16],
                     'cod_distrito': result[17],
-                    'correo': result[18]
+                    'correo': result[18],
+                    'flag_atiende_covid': result[20],
+                    'flag_Atiende_vih': result[21],
+                    'flag_atiende_videollamada': result[22],
+                    'facebook': result[23],
+                    'instagram': result[24],
+                    'twitter': result[25],
+                    'linkedin': result[26]
                 }
 
             if i == 0:
