@@ -183,82 +183,83 @@ class Dispatcher:
                 }
 
         elif parameters['type'] == 'get_medico':
-            #try:
-            i = 0
-            query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-                ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
-                ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-                ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin, ' \
-                ' COUNT(com.id_medico) AS count_doc,  ' \
-                ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
-                ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
-                ' from medico me ' \
-                ' inner join especialidad_medico esme on me.id_medico = esme.id_medico ' \
-                ' inner join especialidad es on esme.id_especialidad = es.id_especialidad ' \
-                ' left join comentarios com on me.id_medico = com.id_medico ' \
-                ' left join usuario us on me.id_medico = us.id_medico ' \
-                ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
-                ' where me.id_medico = {} ' \
-                ' group by me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-                ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
-                ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-                ' me.flag_Atiende_vih,me.flag_atiende_videollamada' \
-                ' order by me.ape_materno;'.format(str(parameters['id_medico']))
+            try:
+                i = 0
+                query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
+                    ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
+                    ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
+                    ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin, ' \
+                    ' COUNT(com.id_medico) AS count_doc,  ' \
+                    ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
+                    ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
+                    ' from medico me ' \
+                    ' inner join especialidad_medico esme on me.id_medico = esme.id_medico ' \
+                    ' inner join especialidad es on esme.id_especialidad = es.id_especialidad ' \
+                    ' left join comentarios com on me.id_medico = com.id_medico ' \
+                    ' left join usuario us on me.id_medico = us.id_medico ' \
+                    ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
+                    ' where me.id_medico = {} ' \
+                    ' group by me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
+                    ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
+                    ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
+                    ' me.flag_Atiende_vih,me.flag_atiende_videollamada' \
+                    ' order by me.ape_materno;'.format(
+                        str(parameters['id_medico']))
 
-            results = self.executeQuery(query)
+                results = self.executeQuery(query)
 
-            if len(results) == 0:
+                if len(results) == 0:
+                    return {
+                        '_status': 0,
+                        'message': self.information['err_medico'],
+                        'medicoArray': []
+                    }
+
+                for result in results:
+                    i += 1
+                    response = {
+                        '_status': 1,
+                        'id_medico': result[0],
+                        'perfil': result[19],
+                        'welcome': ('Dra. ' if result[4] == 1 else 'Dr. ') +
+                        result[1] + ', ' + result[2] + ' ' + result[3],
+                        'nombre': result[1],
+                        'ape_paterno': result[2],
+                        'ape_materno': result[3],
+                        'fec_nacimiento': str(result[11]),
+                        'cmp': result[8],
+                        'genero': result[4],
+                        'id_especialidad': result[12],
+                        'des_especialidad': result[10],
+                        'rme': result[13],
+                        'fec_colegiatura': str(result[14]),
+                        'cod_departamento': result[15],
+                        'cod_provincia': result[16],
+                        'cod_distrito': result[17],
+                        'correo': result[18],
+                        'flag_atiende_covid': result[20],
+                        'flag_Atiende_vih': result[21],
+                        'flag_atiende_videollamada': result[22],
+                        'facebook': result[23],
+                        'instagram': result[24],
+                        'twitter': result[25],
+                        'linkedin': result[26]
+                    }
+
+                if i == 0:
+                    response = {
+                        '_status': 0,
+                        'result': 'El médico no existe en la DB.'
+                    }
+
+                self.conn.cursor().close()
+                return response
+
+            except Exception as e:
                 return {
                     '_status': 0,
-                    'message': self.information['err_medico'],
-                    'medicoArray': []
+                    'message': 'Error en la ejecución de la consulta, ' + str(e)
                 }
-
-            for result in results:
-                i += 1
-                response = {
-                    '_status': 1,
-                    'id_medico': result[0],
-                    'perfil': result[19],
-                    'welcome': ('Dra. ' if result[4] == 1 else 'Dr. ') +
-                    result[1] + ', ' + result[2] + ' ' + result[3],
-                    'nombre': result[1],
-                    'ape_paterno': result[2],
-                    'ape_materno': result[3],
-                    'fec_nacimiento': str(result[11]),
-                    'cmp': result[8],
-                    'genero': result[4],
-                    'id_especialidad': result[12],
-                    'des_especialidad': result[10],
-                    'rme': result[13],
-                    'fec_colegiatura': str(result[14]),
-                    'cod_departamento': result[15],
-                    'cod_provincia': result[16],
-                    'cod_distrito': result[17],
-                    'correo': result[18],
-                    'flag_atiende_covid': result[20],
-                    'flag_Atiende_vih': result[21],
-                    'flag_atiende_videollamada': result[22],
-                    'facebook': result[23],
-                    'instagram': result[24],
-                    'twitter': result[25],
-                    'linkedin': result[26]
-                }
-
-            if i == 0:
-                response = {
-                    '_status': 0,
-                    'result': 'El médico no existe en la DB.'
-                }
-
-            self.conn.cursor().close()
-            return response
-
-            # except Exception as e:
-            #     return {
-            #         '_status': 0,
-            #         'message': 'Error en la ejecución de la consulta, ' + str(e)
-            #     }
 
     def add_row(self, parameters):
         try:
@@ -314,11 +315,11 @@ class Dispatcher:
                 'message': 'Error en la ejecución de la inserción, ' + str(e)
             }
 
-    def executeQuery(self, query):        
+    def executeQuery(self, query):
         if self.conn is False:
             self.conn = self.mydb.connect()
             self.cur = self.conn.cursor()
-            
+
         self.cur.execute(query)
         return self.cur.fetchall()
 
