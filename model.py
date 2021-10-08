@@ -3,6 +3,8 @@ from cryptography.fernet import Fernet
 from config import Config
 from datetime import datetime
 from config import DBMySql
+import pymysql
+# from loguru import logger
 
 
 class Dispatcher:
@@ -55,14 +57,14 @@ class Dispatcher:
                     'ubigeosArray': list(
                         map(lambda ubigeo: {'codi': ubigeo[0], 'description': ubigeo[1]}, ubigeos))
                 }
-                self.conn.cursor().close()
+
                 return response
 
             except Exception as e:
-                return {
-                    '_status': 0,
-                    'message': 'Error en la ejecución de la consulta, ' + str(e)
-                }
+                self.errorResult(e)
+            finally:
+                if self.conn:
+                    self.closeConnect()
 
         elif parameters['type'] == 'Medico':
             # Filtros
@@ -124,14 +126,13 @@ class Dispatcher:
                             'promedio_puntaje': float(medico[13])
                         }, medicos))}
 
-                self.conn.cursor().close()
                 return response
 
             except Exception as e:
-                return {
-                    '_status': 0,
-                    'message': 'Error en la ejecución de la consulta, ' + str(e),
-                }
+                self.errorResult(e)
+            finally:
+                if self.conn:
+                    self.closeConnect()
 
         elif parameters['type'] == 'Login':
             try:
@@ -173,14 +174,13 @@ class Dispatcher:
                         'result': 'El usuario o la contraseña ingresada es incorrecta.'
                     }
 
-                self.conn.cursor().close()
                 return response
 
             except Exception as e:
-                return {
-                    '_status': 0,
-                    'message': 'Error en la ejecución de la consulta, ' + str(e)
-                }
+                self.errorResult(e)
+            finally:
+                if self.conn:
+                    self.closeConnect()
 
         elif parameters['type'] == 'get_medico':
             try:
@@ -196,7 +196,8 @@ class Dispatcher:
                     ' left join usuario us on me.id_medico = us.id_medico ' \
                     ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
                     ' where me.id_medico = {} ' \
-                    ' order by me.ape_materno;'.format(str(parameters['id_medico']))
+                    ' order by me.ape_materno;'.format(
+                        str(parameters['id_medico']))
 
                 results = self.executeQuery(query)
 
@@ -240,24 +241,25 @@ class Dispatcher:
 
                 if i == 0:
                     response = {
-                        '_status': 0,
+                        '_status': 403,
                         'result': 'El médico no existe en la DB.'
                     }
 
-                self.conn.cursor().close()
                 return response
 
+            except pymysql.MySQLError as e:
+                self.errorResult(e)
             except Exception as e:
-                return {
-                    '_status': 0,
-                    'message': 'Error en la ejecución de la consulta, ' + str(e)
-                }
+                self.errorResult(e)
+            finally:
+                if self.conn:
+                    self.closeConnect()
 
     def add_row(self, parameters):
         try:
             if parameters['cod_departamento'] == "":
                 return {
-                    '_status': 0,
+                    '_status': 404,
                     'message': self.information['error_blank']
                 }
 
@@ -295,25 +297,39 @@ class Dispatcher:
                       genero, codigo_cmp, fec_colegiatura, atiende_covid, atiende_vih, videollamada, descripcion_profesional, facebook, instagram,
                       twitter, linkedin, activo, creation_date)
 
+            self.reConnect()
             self.cur.execute(query, values)
             self.conn.commit()
             return {
                 '_status': 200,
-                'message': "Se ha registrado de manera correcta al medico"
+                'message': 'Se ha registrado de manera correcta al medico'
             }
         except Exception as e:
-            return {
-                '_status': 0,
-                'message': 'Error en la ejecución de la inserción, ' + str(e)
-            }
+            self.errorResult(e)
+
+    def errorResult(self, msg):
+        return {
+            '_status': 405,
+            'message': 'Error en la ejecución, ' + str(msg)
+        }
+
+    def reConnect(self):
+        # logger.info('Database reconnection.')
+        self.conn = self.mydb.connect()
+        self.cur = self.conn.cursor()
+
+    def closeConnect(self):
+        self.conn.close()
+        self.conn = None
+        # logger.info('Database connection closed.')
 
     def executeQuery(self, query):
-        if self.conn is False:
-            self.conn = self.mydb.connect()
-            self.cur = self.conn.cursor()
+        if self.conn is None:
+            self.reConnect()
 
         self.cur.execute(query)
-        return self.cur.fetchall()
+        result = self.cur.fetchall()
+        return result
 
     def decrypt(self, encMessage):
         key = Config.TOKEN.encode()  # Fernet.generate_key()
