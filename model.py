@@ -188,10 +188,7 @@ class Dispatcher:
                 query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
                     ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
                     ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-                    ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin, ' \
-                    ' COUNT(com.id_medico) AS count_doc,  ' \
-                    ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
-                    ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
+                    ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
                     ' from medico me ' \
                     ' inner join especialidad_medico esme on me.id_medico = esme.id_medico ' \
                     ' inner join especialidad es on esme.id_especialidad = es.id_especialidad ' \
@@ -199,12 +196,7 @@ class Dispatcher:
                     ' left join usuario us on me.id_medico = us.id_medico ' \
                     ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
                     ' where me.id_medico = {} ' \
-                    ' group by me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-                    ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
-                    ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-                    ' me.flag_Atiende_vih,me.flag_atiende_videollamada' \
-                    ' order by me.ape_materno;'.format(
-                        str(parameters['id_medico']))
+                    ' order by me.ape_materno;'.format(str(parameters['id_medico']))
 
                 results = self.executeQuery(query)
 
