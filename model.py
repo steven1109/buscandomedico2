@@ -4,6 +4,9 @@ from config import Config
 from datetime import datetime
 from config import DBMySql
 import pymysql
+from cMedico import Medico as disMedico
+from cEnfermedades import Enfermedadestratadas as disEnfermedades
+from cFormacion import Formacion as disFormacion
 # from loguru import logger
 
 
@@ -28,6 +31,8 @@ class Dispatcher:
             'provincia': 'cod_departamento',
             'distrito': 'cod_provincia'
         }
+
+        self.dispatcher = {}
 
     def model(self, parameters):
         if parameters['type'] == 'Ubigeo':
@@ -182,36 +187,51 @@ class Dispatcher:
                 if self.conn:
                     self.closeConnect()
 
-        elif parameters['type'] == 'get_medico':
-            try:
-                i = 0
-                query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-                    ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
-                    ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-                    ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
-                    ' from medico me ' \
-                    ' inner join especialidad_medico esme on me.id_medico = esme.id_medico ' \
-                    ' inner join especialidad es on esme.id_especialidad = es.id_especialidad ' \
-                    ' left join comentarios com on me.id_medico = com.id_medico ' \
-                    ' left join usuario us on me.id_medico = us.id_medico ' \
-                    ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
-                    ' where me.id_medico = {} ' \
-                    ' order by me.ape_materno;'.format(
-                        str(parameters['id_medico']))
+    def add_row(self, parameters):
 
-                results = self.executeQuery(query)
+        self.dispatcher = {
+            'medico': disMedico(parameters),
+            'enfermedades': disEnfermedades(parameters),
+            'formacion': disFormacion(parameters)
+        }
 
-                if len(results) == 0:
-                    return {
-                        '_status': 0,
-                        'message': self.information['err_medico'],
-                        'medicoArray': []
-                    }
+        try:
+            query, values = self.dispatcher[parameters['table']].add_data()
+            self.reConnect()
+            self.cur.execute(query, values)
+            self.conn.commit()
+            return {
+                '_status': 200,
+                'message': 'Los datos de {}, se han registrado de manera correcta'.format(parameters['table'])
+            }
+        except pymysql.MySQLError as e:
+            self.errorResult(e)
+        except Exception as e:
+            self.errorResult(e)
 
+    def select_data(self, parameters):
+        self.dispatcher = {
+            'medico': disMedico(parameters),
+            'enfermedades': disEnfermedades(parameters),
+            'formacion': disFormacion(parameters)
+        }
+        try:
+            query = self.dispatcher[parameters['table']].read_data()
+            print(query)
+            self.reConnect()
+            results = self.executeQuery(query)
+
+            if len(results) == 0:
+                return {
+                    '_status': 400,
+                    'message': self.information['err_medico'],
+                    'medicoArray': []
+                }
+
+            if parameters['table'] == 'medico':
                 for result in results:
-                    i += 1
                     response = {
-                        '_status': 1,
+                        '_status': 200,
                         'id_medico': result[0],
                         'perfil': result[19],
                         'welcome': ('Dra. ' if result[4] == 1 else 'Dr. ') +
@@ -239,71 +259,36 @@ class Dispatcher:
                         'linkedin': result[26]
                     }
 
-                if i == 0:
-                    response = {
-                        '_status': 403,
-                        'result': 'El médico no existe en la DB.'
-                    }
+            elif parameters['table'] == 'enfermedades':
+                response = {
+                    '_status': 200,
+                    'enfermedadesArray': list(
+                        map(lambda enfermedad: {
+                            'id_enf_tratadas': int(enfermedad[0]),
+                            'id_medico': int(enfermedad[1]),
+                            'des_enfermedades': enfermedad[2],
+                            'fec_creacion': str(enfermedad[3])
+                        }, results))}
 
-                return response
-
-            except pymysql.MySQLError as e:
-                self.errorResult(e)
-            except Exception as e:
-                self.errorResult(e)
-            finally:
-                if self.conn:
-                    self.closeConnect()
-
-    def add_row(self, parameters):
-        try:
-            if parameters['cod_departamento'] == "":
-                return {
-                    '_status': 404,
-                    'message': self.information['error_blank']
+            elif parameters['table'] == 'formacion':
+                response = {
+                    '_status': 200,
+                    'formacionArray': list(
+                        map(lambda formacion: {
+                            'id_formacion': int(formacion[0]),
+                            'id_medico': int(formacion[1]),
+                            'nom_centro': formacion[2],
+                            'desc_formacion': formacion[3],
+                            'fec_anio_inicio': str(formacion[4]),
+                            'fec_anio_fin': str(formacion[5]),
+                            'fec_creacion': str(formacion[6])
+                        }, results))
                 }
 
-            cod_departamento = parameters['cod_departamento']
-            cod_provincia = parameters['cod_provincia']
-            cod_distrito = parameters['cod_distrito']
-            id_prospecto = parameters['id_prospecto']
-            nombres = parameters['nombres']
-            ape_paterno = parameters['ape_paterno']
-            ape_materno = parameters['ape_materno']
-            fec_nacimiento = parameters['fec_nacimiento']
-            genero = parameters['genero']
-            codigo_cmp = parameters['codigo_cmp']
-            atiende_covid = 0 if int(parameters['atiende_covid']) == 0 else int(
-                parameters['atiende_covid'])
-            atiende_vih = 0 if int(parameters['atiende_vih']) == 0 else int(
-                parameters['atiende_vih'])
-            videollamada = 0 if int(parameters['videollamada']) == 0 else int(
-                parameters['videollamada'])
-            descripcion_profesional = parameters['descripcion_profesional']
-            facebook = parameters['facebook']
-            instagram = parameters['instagram']
-            twitter = parameters['twitter']
-            linkedin = parameters['linkedin']
-            fec_colegiatura = parameters['fec_colegiatura']
-            activo = 1
-            creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            return response
 
-            query = ' INSERT INTO medico (cod_departamento,cod_provincia,cod_distrito,id_prospecto,nombres,ape_paterno,ape_materno,fec_nacimiento, ' \
-                ' genero,codigo_cmp,fec_colegiatura,flag_atiende_covid,flag_Atiende_vih,flag_atiende_videollamada,comentario_personal,facebook, ' \
-                ' instagram,twitter,linkedin,bol_activo,fec_creacion)  ' \
-                ' VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) '
-
-            values = (cod_departamento, cod_provincia, cod_distrito, id_prospecto, nombres, ape_paterno, ape_materno, fec_nacimiento,
-                      genero, codigo_cmp, fec_colegiatura, atiende_covid, atiende_vih, videollamada, descripcion_profesional, facebook, instagram,
-                      twitter, linkedin, activo, creation_date)
-
-            self.reConnect()
-            self.cur.execute(query, values)
-            self.conn.commit()
-            return {
-                '_status': 200,
-                'message': 'Se ha registrado de manera correcta al medico'
-            }
+        except pymysql.MySQLError as e:
+            self.errorResult(e)
         except Exception as e:
             self.errorResult(e)
 

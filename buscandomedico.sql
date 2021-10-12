@@ -193,10 +193,11 @@ CREATE TABLE formacion
 ( 
 	id_formacion         integer primary key auto_increment ,
 	id_medico            integer  NOT NULL ,
+	nom_centro			 varchar(200) NOT NULL,
 	desc_formacion       varchar(250)  NOT NULL ,
 	fec_anio_inicio      datetime  NOT NULL ,
 	fec_anio_fin         datetime  NOT NULL ,
-	fec_Creacion         datetime  NOT NULL ,
+	fec_creacion         datetime  NOT NULL ,
 	fec_modificacion     datetime  default NULL 
 );
 

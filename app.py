@@ -14,8 +14,8 @@ dispatcher = Dispatcher()
 @app.route('/api/busquedaespecialista', methods=['POST'])
 @app.route('/api/login', methods=['POST'])
 @app.route('/api/endpoints', methods=['POST'])
-@app.route('/api/get_medico', methods=['POST'])
 def endpointBuscandomedico():
+    # print(request.base_url.split('/')[-1])
     payload = loads(request.data.decode('utf8').replace("'", '"'))
     response = dispatcher.model(payload)
     return response
@@ -29,6 +29,20 @@ def adding_record():
     if key == "7AB8D23CA175610278D73DC419AA786D150C58EC9C80CCB4EB6FF5395246B640":
         # if request.method == 'GET':
         response = dispatcher.add_row(payload)
+    else:
+        response = make_response(
+            jsonify(response="Unauthorized", status=401), 401)
+    return response
+
+
+@app.route('/api/read', methods=['GET', 'POST'])
+def reading_record():
+    payload = loads(request.data.decode('utf8').replace("'", '"'))
+
+    key = request.headers.get('Authorization', 'Fail')
+    if key == "7AB8D23CA175610278D73DC419AA786D150C58EC9C80CCB4EB6FF5395246B640":
+        # if request.method == 'GET':
+        response = dispatcher.select_data(payload)
     else:
         response = make_response(
             jsonify(response="Unauthorized", status=401), 401)
