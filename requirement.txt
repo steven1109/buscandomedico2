@@ -3,3 +3,6 @@ mysql-connector-python==8.0.25
 python-dotenv==0.18.0
 Flask-Cors==3.0.10
 PyMySQL==1.0.2
+awscli==1.20.60
+boto3==1.18.60
+loguru==0.5.3

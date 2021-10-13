@@ -7,6 +7,8 @@ import pymysql
 from cMedico import Medico as disMedico
 from cEnfermedades import Enfermedadestratadas as disEnfermedades
 from cFormacion import Formacion as disFormacion
+from cConsultorios import Consultorio as disConsultorios
+from cServicios import Servicios as disServico
 # from loguru import logger
 
 
@@ -192,7 +194,9 @@ class Dispatcher:
         self.dispatcher = {
             'medico': disMedico(parameters),
             'enfermedades': disEnfermedades(parameters),
-            'formacion': disFormacion(parameters)
+            'formacion': disFormacion(parameters),
+            'consultorios': disConsultorios(parameters),
+            'servicios': disServico(parameters)
         }
 
         try:
@@ -213,11 +217,12 @@ class Dispatcher:
         self.dispatcher = {
             'medico': disMedico(parameters),
             'enfermedades': disEnfermedades(parameters),
-            'formacion': disFormacion(parameters)
+            'formacion': disFormacion(parameters),
+            'consultorios': disConsultorios(parameters),
+            'servicios': disServico(parameters)
         }
         try:
             query = self.dispatcher[parameters['table']].read_data()
-            print(query)
             self.reConnect()
             results = self.executeQuery(query)
 
@@ -282,6 +287,35 @@ class Dispatcher:
                             'fec_anio_inicio': str(formacion[4]),
                             'fec_anio_fin': str(formacion[5]),
                             'fec_creacion': str(formacion[6])
+                        }, results))
+                }
+
+            elif parameters['table'] == 'consultorios':
+                response = {
+                    '_status': 200,
+                    'consultoriosArray': list(
+                        map(lambda consultorio: {
+                            'id_consultorio': int(consultorio[0]),
+                            'id_medico': int(consultorio[1]),
+                            'cod_distrito': consultorio[2],
+                            'cod_provincia': consultorio[3],
+                            'cod_departamento': consultorio[4],
+                            'des_direccion': consultorio[5],
+                            'horario_atencion': consultorio[6],
+                            'fec_creacion': str(consultorio[7])
+                        }, results))
+                }
+                
+            elif parameters['table'] == 'servicios':
+                response = {
+                    '_status': 200,
+                    'serviciosArroy': list(
+                        map(lambda servicio: {
+                            'id_servicio': int(servicio[0]),
+                            'id_medico': int(servicio[1]),
+                            'des_servicio': servicio[2],
+                            'num_precio': float(servicio[3]),
+                            'fec_creacion': str(servicio[4])
                         }, results))
                 }
 
