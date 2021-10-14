@@ -1,15 +1,13 @@
-import unicodedata
 from cryptography.fernet import Fernet
 from config import Config
-from datetime import datetime
 from config import DBMySql
 import pymysql
-from cMedico import Medico as disMedico
-from cEnfermedades import Enfermedadestratadas as disEnfermedades
-from cFormacion import Formacion as disFormacion
-from cConsultorios import Consultorio as disConsultorios
-from cServicios import Servicios as disServico
-# from loguru import logger
+from src.cMedico import Medico as disMedico
+from src.cEnfermedades import Enfermedadestratadas as disEnfermedades
+from src.cFormacion import Formacion as disFormacion
+from src.cConsultorios import Consultorio as disConsultorios
+from src.cServicios import Servicios as disServico
+from loguru import logger
 
 
 class Dispatcher:
@@ -33,8 +31,6 @@ class Dispatcher:
             'provincia': 'cod_departamento',
             'distrito': 'cod_provincia'
         }
-
-        self.dispatcher = {}
 
     def model(self, parameters):
         if parameters['type'] == 'Ubigeo':
@@ -74,50 +70,14 @@ class Dispatcher:
                     self.closeConnect()
 
         elif parameters['type'] == 'Medico':
-            # Filtros
-            clausulas = ''
             try:
-                if parameters['genero'] != "":
-                    clausulas += ' AND me.genero = {}'.format(
-                        int(parameters['genero']))
-
-                if parameters['cod_departamento'] != "":
-                    clausulas += ' AND me.cod_departamento = "{}"'.format(
-                        parameters['cod_departamento'])
-
-                if parameters['cod_provincia'] != "":
-                    clausulas += ' AND me.cod_provincia = "{}"'.format(
-                        parameters['cod_provincia'])
-
-                if parameters['cod_distrito'] != "":
-                    clausulas += ' AND me.cod_distrito = "{}"'.format(
-                        parameters['cod_distrito'])
-
-                if parameters['especialidad'] != "":
-                    name_specialization = unicodedata.normalize(
-                        'NFKD', parameters['especialidad']).encode('ASCII', 'ignore').upper().decode("utf-8")
-                    clausulas += ' AND es.des_especialidad LIKE "%{}%"'.format(
-                        name_specialization.upper())
-
-                query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-                    ' me.codigo_cmp,me.comentario_personal,es.des_especialidad, ' \
-                    ' COUNT(com.id_medico) AS count_doc,  ' \
-                    ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
-                    ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
-                    ' from medico me ' \
-                    ' inner join especialidad_medico esme on me.id_medico = esme.id_medico ' \
-                    ' inner join especialidad es on esme.id_especialidad = es.id_especialidad ' \
-                    ' left join comentarios com on me.id_medico = com.id_medico ' \
-                    ' where me.bol_activo = 1 {} ' \
-                    ' group by me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-                    ' me.codigo_cmp,me.comentario_personal,es.des_especialidad ' \
-                    ' order by me.ape_materno;'.format(clausulas)
-
+                class_medico = disMedico(parameters)
+                query = class_medico.get_medico_by_especialidad()
                 medicos = self.executeQuery(query)
 
                 if len(medicos) == 0:
                     return {
-                        '_status': 0,
+                        '_status': 404,
                         'message': self.information['err_medico'],
                         'medicosArray': []
                     }
@@ -130,7 +90,8 @@ class Dispatcher:
                             'nombre_completo': medico[1] + ' ' + medico[2] + ' ' + medico[3],
                             'codigo_colegiado': medico[8],
                             'descripcion': medico[9],
-                            'promedio_puntaje': float(medico[13])
+                            'promedio_puntaje': float(medico[13]),
+                            'especialidad': medico[10]
                         }, medicos))}
 
                 return response
@@ -189,9 +150,8 @@ class Dispatcher:
                 if self.conn:
                     self.closeConnect()
 
-    def add_row(self, parameters):
-
-        self.dispatcher = {
+    def dispatcher(self, parameters):
+        return {
             'medico': disMedico(parameters),
             'enfermedades': disEnfermedades(parameters),
             'formacion': disFormacion(parameters),
@@ -199,8 +159,10 @@ class Dispatcher:
             'servicios': disServico(parameters)
         }
 
+    def add_data(self, parameters):
+        dispatcher = self.dispatcher(parameters)
         try:
-            query, values = self.dispatcher[parameters['table']].add_data()
+            query, values = dispatcher[parameters['table']].add_data()
             self.reConnect()
             self.cur.execute(query, values)
             self.conn.commit()
@@ -214,15 +176,14 @@ class Dispatcher:
             self.errorResult(e)
 
     def select_data(self, parameters):
-        self.dispatcher = {
-            'medico': disMedico(parameters),
-            'enfermedades': disEnfermedades(parameters),
-            'formacion': disFormacion(parameters),
-            'consultorios': disConsultorios(parameters),
-            'servicios': disServico(parameters)
-        }
+        dispatcher = self.dispatcher(parameters)
         try:
-            query = self.dispatcher[parameters['table']].read_data()
+            if parameters['table'] == 'medico' and parameters['id_medico'] == '':
+                query = dispatcher[parameters['table']].get_all()
+
+            else:
+                query = dispatcher[parameters['table']].read_data()
+
             self.reConnect()
             results = self.executeQuery(query)
 
@@ -230,97 +191,47 @@ class Dispatcher:
                 return {
                     '_status': 400,
                     'message': self.information['err_medico'],
-                    'medicoArray': []
+                    'emptyArray': []
                 }
 
-            if parameters['table'] == 'medico':
-                for result in results:
-                    response = {
-                        '_status': 200,
-                        'id_medico': result[0],
-                        'perfil': result[19],
-                        'welcome': ('Dra. ' if result[4] == 1 else 'Dr. ') +
-                        result[1] + ', ' + result[2] + ' ' + result[3],
-                        'nombre': result[1],
-                        'ape_paterno': result[2],
-                        'ape_materno': result[3],
-                        'fec_nacimiento': str(result[11]),
-                        'cmp': result[8],
-                        'genero': result[4],
-                        'id_especialidad': result[12],
-                        'des_especialidad': result[10],
-                        'rme': result[13],
-                        'fec_colegiatura': str(result[14]),
-                        'cod_departamento': result[15],
-                        'cod_provincia': result[16],
-                        'cod_distrito': result[17],
-                        'correo': result[18],
-                        'flag_atiende_covid': result[20],
-                        'flag_Atiende_vih': result[21],
-                        'flag_atiende_videollamada': result[22],
-                        'facebook': result[23],
-                        'instagram': result[24],
-                        'twitter': result[25],
-                        'linkedin': result[26]
-                    }
-
-            elif parameters['table'] == 'enfermedades':
-                response = {
-                    '_status': 200,
-                    'enfermedadesArray': list(
-                        map(lambda enfermedad: {
-                            'id_enf_tratadas': int(enfermedad[0]),
-                            'id_medico': int(enfermedad[1]),
-                            'des_enfermedades': enfermedad[2],
-                            'fec_creacion': str(enfermedad[3])
-                        }, results))}
-
-            elif parameters['table'] == 'formacion':
-                response = {
-                    '_status': 200,
-                    'formacionArray': list(
-                        map(lambda formacion: {
-                            'id_formacion': int(formacion[0]),
-                            'id_medico': int(formacion[1]),
-                            'nom_centro': formacion[2],
-                            'desc_formacion': formacion[3],
-                            'fec_anio_inicio': str(formacion[4]),
-                            'fec_anio_fin': str(formacion[5]),
-                            'fec_creacion': str(formacion[6])
-                        }, results))
-                }
-
-            elif parameters['table'] == 'consultorios':
-                response = {
-                    '_status': 200,
-                    'consultoriosArray': list(
-                        map(lambda consultorio: {
-                            'id_consultorio': int(consultorio[0]),
-                            'id_medico': int(consultorio[1]),
-                            'cod_distrito': consultorio[2],
-                            'cod_provincia': consultorio[3],
-                            'cod_departamento': consultorio[4],
-                            'des_direccion': consultorio[5],
-                            'horario_atencion': consultorio[6],
-                            'fec_creacion': str(consultorio[7])
-                        }, results))
-                }
-                
-            elif parameters['table'] == 'servicios':
-                response = {
-                    '_status': 200,
-                    'serviciosArroy': list(
-                        map(lambda servicio: {
-                            'id_servicio': int(servicio[0]),
-                            'id_medico': int(servicio[1]),
-                            'des_servicio': servicio[2],
-                            'num_precio': float(servicio[3]),
-                            'fec_creacion': str(servicio[4])
-                        }, results))
-                }
+            response = dispatcher[parameters['table']].response_data(
+                results)
 
             return response
 
+        except pymysql.MySQLError as e:
+            self.errorResult(e)
+        except Exception as e:
+            self.errorResult(e)
+            
+    def update_data(self, parameters):
+        dispatcher = self.dispatcher(parameters)
+        try:
+            logger.info('Updating data...')
+            query, values = dispatcher[parameters['table']].update_data()
+            self.reConnect()
+            self.cur.execute(query, values)
+            self.conn.commit()
+            return {
+                '_status': 200,
+                'message': 'Los datos se han actualizado correctamente'
+            }
+        except pymysql.MySQLError as e:
+            self.errorResult(e)
+        except Exception as e:
+            self.errorResult(e)
+
+    def delete_data(self, parameters):
+        dispatcher = self.dispatcher(parameters)
+        try:
+            query = dispatcher[parameters['table']].delete_data()
+            self.reConnect()
+            self.cur.execute(query)
+            self.conn.commit()
+            return {
+                '_status': 200,
+                'message': 'Los datos se han eliminado de manera correcta'
+            }
         except pymysql.MySQLError as e:
             self.errorResult(e)
         except Exception as e:

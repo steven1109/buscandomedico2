@@ -1,4 +1,6 @@
-from flask import Flask, request, render_template, make_response, jsonify # , redirect, send_file
+# , redirect, send_file
+# , redirect, send_file
+from flask import Flask, request, render_template, make_response, jsonify
 from config import Config
 from json import loads
 from flask_cors import CORS
@@ -48,36 +50,30 @@ dispatcher = Dispatcher()
 @app.route('/api/ubigeo', methods=['POST'])
 @app.route('/api/busquedaespecialista', methods=['POST'])
 @app.route('/api/login', methods=['POST'])
-@app.route('/api/endpoints', methods=['POST'])
 def endpointBuscandomedico():
-    # print(request.base_url.split('/')[-1])
     payload = loads(request.data.decode('utf8').replace("'", '"'))
     response = dispatcher.model(payload)
     return response
 
 
 @app.route('/api/add', methods=['GET', 'POST'])
+@app.route('/api/read', methods=['GET', 'POST'])
+@app.route('/api/update', methods=['GET', 'POST'])
+@app.route('/api/delete', methods=['GET', 'POST'])
 def adding_record():
     payload = loads(request.data.decode('utf8').replace("'", '"'))
-
     key = request.headers.get('Authorization', 'Fail')
     if key == "7AB8D23CA175610278D73DC419AA786D150C58EC9C80CCB4EB6FF5395246B640":
-        # if request.method == 'GET':
-        response = dispatcher.add_row(payload)
-    else:
-        response = make_response(
-            jsonify(response="Unauthorized", status=401), 401)
-    return response
+        action = request.base_url.split('/')[-1]
+        if action == "add":
+            response = dispatcher.add_data(payload)
+        elif action == 'read':
+            response = dispatcher.select_data(payload)
+        elif action == 'update':
+            response = dispatcher.update_data(payload)
+        elif action == 'delete':
+            response = dispatcher.delete_data(payload)
 
-
-@app.route('/api/read', methods=['GET', 'POST'])
-def reading_record():
-    payload = loads(request.data.decode('utf8').replace("'", '"'))
-
-    key = request.headers.get('Authorization', 'Fail')
-    if key == "7AB8D23CA175610278D73DC419AA786D150C58EC9C80CCB4EB6FF5395246B640":
-        # if request.method == 'GET':
-        response = dispatcher.select_data(payload)
     else:
         response = make_response(
             jsonify(response="Unauthorized", status=401), 401)

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List content</title>
+</head>
+
+<body>
+    <!-- {% for im in images %}
+    <p>{{im}}</p>
+    {% endfor %} -->
+    <p>----------------------------------------------------------------</p>
+    {% for item in images %}
+    <li>
+        <img src={{ item }} style="width: 250px">
+    </li>
+    {% endfor %}
+
+    <p>----------------------------------------------------------------</p>
+    <ul>
+        {% for item in elements %}
+        <li>
+            <a href="/download/{{ item.Key }}"> {{ item.Key }} </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <img src="https://photomedicos.s3.amazonaws.com/Screenshot%20from%202021-07-13%2009-21-31.png?AWSAccessKeyId=AKIA5YXDO6KESBU2HM7A&Signature=kWp1Yef9Pybu%2B1UXNfBVNLVGzrY%3D&Expires=1634195492" style="width: 250px" alt="">
+
+</body>
+
+</html>
