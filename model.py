@@ -7,7 +7,7 @@ from src.cEnfermedades import Enfermedadestratadas as disEnfermedades
 from src.cFormacion import Formacion as disFormacion
 from src.cConsultorios import Consultorio as disConsultorios
 from src.cServicios import Servicios as disServico
-from loguru import logger
+# from loguru import logger
 
 
 class Dispatcher:
@@ -207,7 +207,7 @@ class Dispatcher:
     def update_data(self, parameters):
         dispatcher = self.dispatcher(parameters)
         try:
-            logger.info('Updating data...')
+            # logger.info('Updating data...')
             query, values = dispatcher[parameters['table']].update_data()
             self.reConnect()
             self.cur.execute(query, values)

@@ -205,6 +205,7 @@ CREATE TABLE servicio
 ( 
 	id_servicio          integer PRIMARY KEY auto_increment ,
 	id_medico            integer  NOT NULL ,
+	id_consultorio		 integer NOT NULL,
 	des_servicio         varchar(200)  NOT NULL ,
 	num_precio           decimal(10,2)  NOT NULL ,
 	fec_creacion         datetime  NOT NULL ,

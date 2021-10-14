@@ -1,11 +1,10 @@
 # , redirect, send_file
-# , redirect, send_file
 from flask import Flask, request, render_template, make_response, jsonify
 from config import Config
 from json import loads
 from flask_cors import CORS
 from model import Dispatcher
-import utils
+# import utils
 import os
 
 app = Flask(__name__)
