@@ -3,10 +3,11 @@ import boto3
 from botocore.exceptions import ClientError
 from botocore.exceptions import NoCredentialsError
 import os
+from config import Config
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-ACCESS_KEY = 'AKIA5YXDO6KESBU2HM7A'
-SECRET_ACCESS_KEY = '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'
+ACCESS_KEY = Config.ACCESS_KEY
+SECRET_ACCESS_KEY = Config.SECRET_ACCESS_KEY
 dir = '/home/steven.jefferson.ve/Pictures'
 
 

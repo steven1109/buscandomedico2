@@ -17,6 +17,8 @@ class Config:
     # MYSQL_USER = os.getenv("MYSQL_USER_AWS")
     # MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD_AWS")
     TOKEN = os.getenv("token")
+    ACCESS_KEY = os.getenv("ACCESS_KEY")
+    SECRET_ACCESS_KEY = os.getenv("SECRET_ACCESS_KEY_AWS")
 
 
 class DBMySql:
