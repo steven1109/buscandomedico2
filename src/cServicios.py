@@ -14,14 +14,20 @@ class Servicios:
         query = ' INSERT INTO servicio (id_medico,id_consultorio,des_servicio,num_precio,fec_creacion) ' \
             ' VALUES(%s,%s,%s,%s,%s) '
 
-        values = (id_medico, id_consultorio, des_servicio, num_precio, fec_creacion)
+        values = (id_medico, id_consultorio,
+                  des_servicio, num_precio, fec_creacion)
 
         return query, values
 
     def read_data(self):
-        query = ' select id_servicio,id_medico,id_consultorio,des_servicio,num_precio,fec_creacion ' \
-            ' from servicio ' \
-            ' where id_medico = {}'.format(
+        query = ' select ser.id_servicio,ser.id_medico,ser.id_consultorio,con.cod_provincia,pro.des_provincia, ' \
+            ' con.cod_distrito,dis.des_distrito,con.des_direccion,ser.des_servicio,ser.num_precio,ser.fec_creacion ' \
+            ' from servicio ser ' \
+            ' inner join consultorio con on ser.id_consultorio = con.id_consultorio ' \
+            ' inner join departamento dep on con.cod_departamento = dep.cod_departamento ' \
+            ' inner join provincia pro on con.cod_provincia = pro.cod_provincia ' \
+            ' inner join distrito dis on con.cod_distrito = dis.cod_distrito ' \
+            ' where ser.id_medico = {}'.format(
                 str(self.param['id_medico']))
 
         return query
@@ -50,9 +56,11 @@ class Servicios:
                     'id_servicio': int(servicio[0]),
                     'id_medico': int(servicio[1]),
                     'id_consultorio': int(servicio[2]),
-                    'des_servicio': servicio[3],
-                    'num_precio': float(servicio[4]),
-                    'fec_creacion': str(servicio[5])
+                    'direccion': servicio[7],
+                    'distrito_direccion': (str(servicio[6]) + ' - ' + servicio[7]),
+                    'des_servicio': servicio[8],
+                    'num_precio': float(servicio[9]),
+                    'fec_creacion': str(servicio[10])
                 }, results))
         }
         return response
