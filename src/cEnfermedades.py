@@ -9,15 +9,17 @@ class Enfermedadestratadas:
         id_medico = self.param['id_medico']
         des_enfermedades = self.param['des_enfermedades']
         fec_creacion = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        query = ' INSERT INTO enfermedades_tratadas (id_medico, des_enfermedades, fec_creacion)  ' \
-            ' VALUES(%s,%s,%s) '
+        des_tratamiento = self.param['des_tratamiento'] if 'des_tratamiento' in self.param else None
 
-        values = (id_medico, des_enfermedades, fec_creacion)
+        query = ' INSERT INTO enfermedades_tratadas (id_medico, des_enfermedades, des_tratamiento, fec_creacion)  ' \
+            ' VALUES(%s,%s,%s, %s) '
+
+        values = (id_medico, des_enfermedades, des_tratamiento, fec_creacion)
 
         return query, values
 
     def read_data(self):
-        query = ' select id_enf_tratadas, id_medico, des_enfermedades, fec_creacion ' \
+        query = ' select id_enf_tratadas, id_medico, des_enfermedades, des_tratamiento, fec_creacion ' \
             ' from enfermedades_tratadas ' \
             ' where id_medico = {}'.format(
                 str(self.param['id_medico']))
@@ -27,12 +29,13 @@ class Enfermedadestratadas:
     def update_data(self):
         des_enfermedades = self.param['des_enfermedades']
         modification_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        query = ' UPDATE enfermedades_tratadas SET des_enfermedades = %s, fec_modificacion = %s ' \
+        des_tratamiento = self.param['des_tratamiento']
+
+        query = ' UPDATE enfermedades_tratadas SET des_enfermedades = %s, des_tratamiento = %s, fec_modificacion = %s ' \
             ' WHERE id_enf_tratadas = {}'.format(self.param['id_enf_tratadas'])
-            
-        values = (des_enfermedades, modification_date)
-        
+
+        values = (des_enfermedades, des_tratamiento, modification_date)
+
         return query, values
 
     def delete_data(self):
@@ -46,7 +49,8 @@ class Enfermedadestratadas:
                     'id_enf_tratadas': int(enfermedad[0]),
                     'id_medico': int(enfermedad[1]),
                     'des_enfermedades': enfermedad[2],
-                    'fec_creacion': str(enfermedad[3])
+                    'des_tratamiento': enfermedad[3],
+                    'fec_creacion': str(enfermedad[4])
                 }, results))}
 
         return response
