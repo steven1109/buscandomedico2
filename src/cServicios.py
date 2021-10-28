@@ -44,7 +44,8 @@ class Servicios:
         query = ' update servicio set id_consultorio = %s, des_servicio = %s, num_precio = %s, flag_mostrar_precio = %s, fec_modificacion = %s' \
             ' where id_servicio = {}'.format(self.param['id_servicio'])
 
-        values = (id_consultorio, des_servicio, num_precio, flag_mostrar_precio, fec_modificacion)
+        values = (id_consultorio, des_servicio, num_precio,
+                  flag_mostrar_precio, fec_modificacion)
 
         return query, values
 
@@ -52,19 +53,26 @@ class Servicios:
         return 'delete from servicio WHERE id_servicio = {}'.format(self.param['id_servicio'])
 
     def response_data(self, results):
-        response = {
-            '_status': 200,
-            'serviciosArroy': list(
-                map(lambda servicio: {
-                    'id_servicio': int(servicio[0]),
-                    'id_medico': int(servicio[1]),
-                    'id_consultorio': int(servicio[2]),
-                    'direccion': servicio[7],
-                    'distrito_direccion': (str(servicio[6]) + ' - ' + servicio[7]),
-                    'des_servicio': servicio[8],
-                    'num_precio': float(servicio[9]),
-                    'mostrar_precio': bool(servicio[10]),
-                    'fec_creacion': str(servicio[11])
-                }, results))
-        }
+        if len(results) == 0:
+            return {
+                '_status': 400,
+                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+                'emptyArray': []
+            }
+        else:
+            response = {
+                '_status': 200,
+                'serviciosArroy': list(
+                    map(lambda servicio: {
+                        'id_servicio': int(servicio[0]),
+                        'id_medico': int(servicio[1]),
+                        'id_consultorio': int(servicio[2]),
+                        'direccion': servicio[7],
+                        'distrito_direccion': (str(servicio[6]) + ' - ' + servicio[7]),
+                        'des_servicio': servicio[8],
+                        'num_precio': float(servicio[9]),
+                        'mostrar_precio': bool(servicio[10]),
+                        'fec_creacion': str(servicio[11])
+                    }, results))
+            }
         return response

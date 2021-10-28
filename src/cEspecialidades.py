@@ -1,4 +1,5 @@
 from datetime import datetime
+import unicodedata
 
 
 class Especialidades:
@@ -9,9 +10,16 @@ class Especialidades:
         pass
 
     def read_data(self):
+        clausulas = ''
+        if self.param['especialidad'] != "":
+            name_specialization = unicodedata.normalize(
+                'NFKD', self.param['especialidad']).encode('ASCII', 'ignore').upper().decode("utf-8")
+            clausulas += ' AND es.des_especialidad LIKE "%{}%"'.format(
+                name_specialization.upper())
+
         query = ' select id_especialidad, des_especialidad, bol_activo ' \
-            ' from especialidad where bol_activo = 1;'
-        
+            ' from especialidad where bol_activo = 1 {};'.format(clausulas)
+
         return query
 
     def update_data(self):

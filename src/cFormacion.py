@@ -47,17 +47,24 @@ class Formacion:
         return 'delete from formacion WHERE id_formacion = {}'.format(self.param['id_formacion'])
 
     def response_data(self, results):
-        response = {
-            '_status': 200,
-            'formacionArray': list(
-                map(lambda formacion: {
-                    'id_formacion': int(formacion[0]),
-                    'id_medico': int(formacion[1]),
-                    'nom_centro': formacion[2],
-                    'desc_formacion': formacion[3],
-                    'fec_anio_inicio': str(formacion[4]),
-                    'fec_anio_fin': str(formacion[5]),
-                    'fec_creacion': str(formacion[6])
-                }, results))
-        }
+        if len(results) == 0:
+            return {
+                '_status': 400,
+                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+                'emptyArray': []
+            }
+        else:
+            response = {
+                '_status': 200,
+                'formacionArray': list(
+                    map(lambda formacion: {
+                        'id_formacion': int(formacion[0]),
+                        'id_medico': int(formacion[1]),
+                        'nom_centro': formacion[2],
+                        'desc_formacion': formacion[3],
+                        'fec_anio_inicio': str(formacion[4]),
+                        'fec_anio_fin': str(formacion[5]),
+                        'fec_creacion': str(formacion[6])
+                    }, results))
+            }
         return response

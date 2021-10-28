@@ -61,18 +61,25 @@ class EspecialidadMedico:
         return query
 
     def response_data(self, results):
-        response = {
-            '_status': 200,
-            'especialidadArray': list(
-                map(lambda especialidad: {
-                    'id_especialidad_medico': especialidad[0],
-                    'id_especialidad': especialidad[1],
-                    'des_especialidad': especialidad[2],
-                    'id_medico': especialidad[3],
-                    'nombre_completo': especialidad[4] + ', ' + especialidad[5] + ' ' + especialidad[6],
-                    'codigo_rne': especialidad[7]
-                }, results)
-            )
-        }
+        if len(results) == 0:
+            return {
+                '_status': 400,
+                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+                'emptyArray': []
+            }
+        else:
+            response = {
+                '_status': 200,
+                'especialidadArray': list(
+                    map(lambda especialidad: {
+                        'id_especialidad_medico': especialidad[0],
+                        'id_especialidad': especialidad[1],
+                        'des_especialidad': especialidad[2],
+                        'id_medico': especialidad[3],
+                        'nombre_completo': especialidad[4] + ', ' + especialidad[5] + ' ' + especialidad[6],
+                        'codigo_rne': especialidad[7]
+                    }, results)
+                )
+            }
 
         return response

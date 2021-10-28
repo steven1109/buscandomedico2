@@ -42,15 +42,22 @@ class Enfermedadestratadas:
         return 'delete from enfermedades_tratadas WHERE id_enf_tratadas = {}'.format(self.param['id_enf_tratadas'])
 
     def response_data(self, results):
-        response = {
-            '_status': 200,
-            'enfermedadesArray': list(
-                map(lambda enfermedad: {
-                    'id_enf_tratadas': int(enfermedad[0]),
-                    'id_medico': int(enfermedad[1]),
-                    'des_enfermedades': enfermedad[2],
-                    'des_tratamiento': enfermedad[3],
-                    'fec_creacion': str(enfermedad[4])
-                }, results))}
+        if len(results) == 0:
+            return {
+                '_status': 400,
+                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+                'emptyArray': []
+            }
+        else:
+            response = {
+                '_status': 200,
+                'enfermedadesArray': list(
+                    map(lambda enfermedad: {
+                        'id_enf_tratadas': int(enfermedad[0]),
+                        'id_medico': int(enfermedad[1]),
+                        'des_enfermedades': enfermedad[2],
+                        'des_tratamiento': enfermedad[3],
+                        'fec_creacion': str(enfermedad[4])
+                    }, results))}
 
         return response

@@ -54,22 +54,29 @@ class Consultorio:
         return 'delete from consultorio WHERE id_consultorio = {}'.format(self.param['id_consultorio'])
 
     def response_data(self, results):
-        response = {
-            '_status': 200,
-            'consultoriosArray': list(
-                map(lambda consultorio: {
-                    'id_consultorio': int(consultorio[0]),
-                    'id_medico': int(consultorio[1]),
-                    'cod_departamento': str(consultorio[2]),
-                    'des_departamento': consultorio[3],
-                    'cod_provincia': str(consultorio[4]),
-                    'des_provincia': consultorio[5],
-                    'cod_distrito': str(consultorio[6]),
-                    'des_distrito': consultorio[7],
-                    'des_direccion': consultorio[8],
-                    'horario_atencion': consultorio[9],
-                    'fec_creacion': str(consultorio[10])
-                }, results))
-        }
+        if len(results) == 0:
+            return {
+                '_status': 400,
+                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+                'emptyArray': []
+            }
+        else:
+            response = {
+                '_status': 200,
+                'consultoriosArray': list(
+                    map(lambda consultorio: {
+                        'id_consultorio': int(consultorio[0]),
+                        'id_medico': int(consultorio[1]),
+                        'cod_departamento': str(consultorio[2]),
+                        'des_departamento': consultorio[3],
+                        'cod_provincia': str(consultorio[4]),
+                        'des_provincia': consultorio[5],
+                        'cod_distrito': str(consultorio[6]),
+                        'des_distrito': consultorio[7],
+                        'des_direccion': consultorio[8],
+                        'horario_atencion': consultorio[9],
+                        'fec_creacion': str(consultorio[10])
+                    }, results))
+            }
 
         return response
