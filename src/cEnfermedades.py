@@ -31,8 +31,9 @@ class Enfermedadestratadas:
         modification_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         des_tratamiento = self.param['des_tratamiento']
 
-        query = ' UPDATE enfermedades_tratadas SET des_enfermedades = %s, des_tratamiento = %s, fec_modificacion = %s ' \
-            ' WHERE id_enf_tratadas = {}'.format(self.param['id_enf_tratadas'])
+        query = ' UPDATE enfermedades_tratadas SET des_enfermedades = %s, des_tratamiento = %s, ' \
+                ' fec_modificacion = %s ' \
+                ' WHERE id_enf_tratadas = {}'.format(self.param['id_enf_tratadas'])
 
         values = (des_enfermedades, des_tratamiento, modification_date)
 
@@ -44,8 +45,8 @@ class Enfermedadestratadas:
     def response_data(self, results):
         if len(results) == 0:
             return {
-                '_status': 400,
-                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+                '_status': 404,
+                'message': 'Error, No existen datos en la tabla {}'.format(self.param['table']),
                 'emptyArray': []
             }
         else:

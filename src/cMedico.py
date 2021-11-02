@@ -38,30 +38,30 @@ class Medico:
         activo = self.param['activo']
         creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        query = ' INSERT INTO medico (cod_departamento,cod_provincia,cod_distrito,id_prospecto,nombres,ape_paterno,ape_materno,fec_nacimiento, ' \
-            ' genero,codigo_cmp,fec_colegiatura,flag_atiende_covid,flag_Atiende_vih,flag_atiende_videollamada,comentario_personal,facebook, ' \
-            ' instagram,twitter,linkedin,bol_activo,fec_creacion)  ' \
-            ' VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) '
+        query = ' INSERT INTO medico (cod_departamento,cod_provincia,cod_distrito,id_prospecto,nombres,ape_paterno,' \
+                ' ape_materno,fec_nacimiento,genero,codigo_cmp,fec_colegiatura,flag_atiende_covid,flag_Atiende_vih,' \
+                ' flag_atiende_videollamada,comentario_personal,facebook,instagram,twitter,linkedin,' \
+                ' bol_activo,fec_creacion) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) '
 
-        values = (cod_departamento, cod_provincia, cod_distrito, id_prospecto, nombres, ape_paterno, ape_materno, fec_nacimiento,
-                  genero, codigo_cmp, fec_colegiatura, atiende_covid, atiende_vih, videollamada, descripcion_profesional, facebook, instagram,
-                  twitter, linkedin, activo, creation_date)
+        values = (cod_departamento, cod_provincia, cod_distrito, id_prospecto, nombres, ape_paterno, ape_materno,
+                  fec_nacimiento, genero, codigo_cmp, fec_colegiatura, atiende_covid, atiende_vih, videollamada,
+                  descripcion_profesional, facebook, instagram, twitter, linkedin, activo, creation_date)
 
         return query, values
 
     def read_data(self):
-        query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-            ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
-            ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-            ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
-            ' from medico me ' \
-            ' left join especialidad_medico esme on me.id_medico = esme.id_medico ' \
-            ' left join especialidad es on esme.id_especialidad = es.id_especialidad ' \
-            ' left join usuario us on me.id_medico = us.id_medico ' \
-            ' left join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
-            ' where me.id_medico = {} ' \
-            ' ORDER BY me.ape_materno;'.format(
-                str(self.param['id_medico']))
+        query = ' select me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,' \
+                ' me.cod_distrito,me.cod_provincia,me.codigo_cmp,me.comentario_personal,es.des_especialidad,' \
+                ' me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura,me.cod_departamento,' \
+                ' me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
+                ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
+                ' from medico me ' \
+                ' left join especialidad_medico esme on me.id_medico = esme.id_medico ' \
+                ' left join especialidad es on esme.id_especialidad = es.id_especialidad ' \
+                ' left join usuario us on me.id_medico = us.id_medico ' \
+                ' left join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
+                ' where me.id_medico = {} ' \
+                ' ORDER BY me.ape_materno;'.format(str(self.param['id_medico']))
 
         return query
 
@@ -91,14 +91,15 @@ class Medico:
         activo = self.param['activo']
         modification_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        query = 'UPDATE medico SET cod_departamento = %s,cod_provincia = %s,cod_distrito = %s,id_prospecto = %s,nombres = %s,ape_paterno = %s,ape_materno = %s,fec_nacimiento = %s, ' \
-            ' genero = %s,codigo_cmp = %s,fec_colegiatura = %s,flag_atiende_covid = %s,flag_Atiende_vih = %s,flag_atiende_videollamada = %s,comentario_personal = %s,facebook = %s, ' \
-            ' instagram = %s,twitter = %s,linkedin = %s,bol_activo = %s,fec_modificacion = %s ' \
-            ' WHERE id_medico = {}'.format(self.param['id_medico'])
+        query = ' UPDATE medico SET cod_departamento = %s,cod_provincia = %s,cod_distrito = %s,id_prospecto = %s,' \
+                ' nombres = %s,ape_paterno = %s,ape_materno = %s,fec_nacimiento = %s,genero = %s,codigo_cmp = %s,' \
+                ' fec_colegiatura = %s,flag_atiende_covid = %s,flag_Atiende_vih = %s,flag_atiende_videollamada = %s,' \
+                ' comentario_personal = %s,facebook = %s,instagram = %s,twitter = %s,linkedin = %s,' \
+                ' bol_activo = %s,fec_modificacion = %s WHERE id_medico = {}'.format(self.param['id_medico'])
 
-        values = (cod_departamento, cod_provincia, cod_distrito, id_prospecto, nombres, ape_paterno, ape_materno, fec_nacimiento,
-                  genero, codigo_cmp, fec_colegiatura, atiende_covid, atiende_vih, videollamada, descripcion_profesional, facebook, instagram,
-                  twitter, linkedin, activo, modification_date)
+        values = (cod_departamento, cod_provincia, cod_distrito, id_prospecto, nombres, ape_paterno, ape_materno,
+                  fec_nacimiento, genero, codigo_cmp, fec_colegiatura, atiende_covid, atiende_vih, videollamada,
+                  descripcion_profesional, facebook, instagram, twitter, linkedin, activo, modification_date)
 
         return query, values
 
@@ -106,16 +107,17 @@ class Medico:
         return 'UPDATE medico SET bol_activo = 0 WHERE id_medico = {}'.format(self.param['id_medico'])
 
     def get_all(self):
-        query = ' SELECT me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-            ' me.codigo_cmp,me.comentario_personal,es.des_especialidad,me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura, ' \
-            ' me.cod_departamento,me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-            ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
-            ' FROM medico me ' \
-            ' LEFT JOIN especialidad_medico esme on me.id_medico = esme.id_medico ' \
-            ' LEFT JOIN especialidad es on esme.id_especialidad = es.id_especialidad ' \
-            ' LEFT JOIN usuario us on me.id_medico = us.id_medico ' \
-            ' LEFT JOIN perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
-            ' ORDER BY me.ape_materno;'
+        query = ' SELECT me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,' \
+                ' me.cod_distrito,me.cod_provincia,me.codigo_cmp,me.comentario_personal,es.des_especialidad,' \
+                ' me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura,me.cod_departamento,' \
+                ' me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
+                ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
+                ' FROM medico me ' \
+                ' LEFT JOIN especialidad_medico esme on me.id_medico = esme.id_medico ' \
+                ' LEFT JOIN especialidad es on esme.id_especialidad = es.id_especialidad ' \
+                ' LEFT JOIN usuario us on me.id_medico = us.id_medico ' \
+                ' LEFT JOIN perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
+                ' ORDER BY me.ape_materno;'
 
         return query
 
@@ -143,28 +145,27 @@ class Medico:
             clausulas += ' AND es.des_especialidad LIKE "%{}%"'.format(
                 name_specialization.upper())
 
-        query = ' SELECT me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-            ' me.codigo_cmp,me.comentario_personal,es.des_especialidad, ' \
-            ' COUNT(com.id_medico) AS count_doc,  ' \
-            ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
-            ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
-            ' FROM medico me ' \
-            ' INNER JOIN especialidad_medico esme on me.id_medico = esme.id_medico ' \
-            ' INNER JOIN especialidad es on esme.id_especialidad = es.id_especialidad ' \
-            ' LEFT JOIN comentarios com on me.id_medico = com.id_medico ' \
-            ' WHERE me.bol_activo = 1 {} ' \
-            ' GROUP BY me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,me.cod_distrito,me.cod_provincia, ' \
-            ' me.codigo_cmp,me.comentario_personal,es.des_especialidad ' \
-            ' ORDER BY me.ape_materno;'.format(clausulas)
+        query = ' SELECT me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,' \
+                ' me.cod_distrito,me.cod_provincia,me.codigo_cmp,me.comentario_personal,es.des_especialidad, ' \
+                ' COUNT(com.id_medico) AS count_doc,  ' \
+                ' CASE WHEN COUNT(com.id_medico) > 0 THEN SUM(com.puntaje) ELSE 0 END AS sum_com, ' \
+                ' CASE WHEN COUNT(com.id_medico) > 0 THEN ROUND(AVG(com.puntaje),2) ELSE 0 END AS prom ' \
+                ' FROM medico me ' \
+                ' INNER JOIN especialidad_medico esme on me.id_medico = esme.id_medico ' \
+                ' INNER JOIN especialidad es on esme.id_especialidad = es.id_especialidad ' \
+                ' LEFT JOIN comentarios com on me.id_medico = com.id_medico ' \
+                ' WHERE me.bol_activo = 1 {} ' \
+                ' GROUP BY me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,' \
+                ' me.cod_distrito,me.cod_provincia,me.codigo_cmp,me.comentario_personal,es.des_especialidad ' \
+                ' ORDER BY me.ape_materno;'.format(clausulas)
 
         return query
 
     def response_data(self, results):
-        print('Responses....')
         if len(results) == 0:
-            return {
-                '_status': 400,
-                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+            response = {
+                '_status': 404,
+                'message': 'Error, No existen datos en la tabla {}'.format(self.param['table']),
                 'emptyArray': []
             }
 

@@ -14,6 +14,11 @@ class Ubigeo:
             'provincia': 'cod_departamento',
             'distrito': 'cod_provincia'
         }
+        self.information = {
+            'error_exists': 'Error, el código no existe en la tabla {}',
+            'error_blank': 'Error, debe enviar un código para la consulta',
+            'err_medico': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo'
+        }
 
     def add_data(self):
         pass
@@ -21,10 +26,7 @@ class Ubigeo:
     def read_data(self):
         condition = ''
         if self.param['value'] == "" and self.param['table'] != 'departamento':
-            query = {
-                '_status': 0,
-                'message': self.information['error_blank']
-            }
+            query = ''
 
         if self.param['value'] != '' and self.param['field'] != '':
             condition = f'where {self.param["field"]} = "{self.param["value"]}";'
@@ -42,7 +44,7 @@ class Ubigeo:
     def response_data(self, results):
         if len(results) == 0:
             response = {
-                '_status': 0,
+                '_status': 404,
                 'message': 'Error, el código no existe en la tabla {}'.format(self.param['table']),
                 'ubigeosArray': []
             }

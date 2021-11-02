@@ -8,6 +8,7 @@ from src.cServicios import Servicios as disServico
 from src.cLogin import Login as disLogin
 from src.cUbigeo import Ubigeo as disUbigeo
 from src.cEspecialidades import Especialidades as disEspecialidades
+from src.cEspecialidadMedico import EspecialidadMedico as disEspecialidadmedico
 # from loguru import logger
 
 
@@ -17,11 +18,6 @@ class Dispatcher:
         self.mydb.initialize()
         self.conn = self.mydb.connect()
         self.cur = self.conn.cursor()
-        self.information = {
-            'error_exists': 'Error, el código no existe en la tabla {}',
-            'error_blank': 'Error, debe enviar un código para la consulta',
-            'err_medico': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo'
-        }
 
     def model(self, parameters):
         if parameters['type'] == 'Ubigeo':
@@ -66,7 +62,8 @@ class Dispatcher:
             'formacion': disFormacion(parameters),
             'consultorios': disConsultorios(parameters),
             'servicios': disServico(parameters),
-            'especialidades': disEspecialidades(parameters)
+            'especialidades': disEspecialidades(parameters),
+            'especialidadmedico': disEspecialidadmedico(parameters)
         }
 
     def add_data(self, parameters):

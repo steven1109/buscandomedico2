@@ -13,8 +13,10 @@ class Consultorio:
         des_direccion = self.param['des_direccion']
         horario_atencion = self.param['horario_atencion']
         fec_creacion = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        query = ' INSERT INTO consultorio (id_medico,cod_distrito,cod_provincia,cod_departamento,des_direccion,horario_atencion,fec_creacion) ' \
-            ' VALUES(%s,%s,%s,%s,%s,%s,%s) '
+
+        query = ' INSERT INTO consultorio (id_medico,cod_distrito,cod_provincia,cod_departamento,' \
+                ' des_direccion,horario_atencion,fec_creacion) ' \
+                ' VALUES(%s,%s,%s,%s,%s,%s,%s) '
 
         values = (id_medico, cod_distrito, cod_provincia, cod_departamento,
                   des_direccion, horario_atencion, fec_creacion)
@@ -42,8 +44,9 @@ class Consultorio:
         horario_atencion = self.param['horario_atencion']
         fec_modificacion = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        query = 'UPDATE consultorio SET cod_distrito = %s, cod_provincia = %s, cod_departamento = %s, des_direccion = %s, horario_atencion = %s, fec_modificacion = %s ' \
-            ' WHERE id_consultorio = {}'.format(self.param['id_consultorio'])
+        query = ' UPDATE consultorio SET cod_distrito = %s, cod_provincia = %s, cod_departamento = %s, ' \
+                ' des_direccion = %s, horario_atencion = %s, fec_modificacion = %s ' \
+                ' WHERE id_consultorio = {}'.format(self.param['id_consultorio'])
 
         values = (cod_distrito, cod_provincia, cod_departamento,
                   des_direccion, horario_atencion, fec_modificacion)
@@ -55,9 +58,9 @@ class Consultorio:
 
     def response_data(self, results):
         if len(results) == 0:
-            return {
-                '_status': 400,
-                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+            response = {
+                '_status': 404,
+                'message': 'Error, No existen datos en la tabla {}'.format(self.param['table']),
                 'emptyArray': []
             }
         else:

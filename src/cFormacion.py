@@ -35,9 +35,10 @@ class Formacion:
         fec_anio_inicio = self.param['fec_anio_inicio']
         fec_anio_fin = self.param['fec_anio_fin']
         modification_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        query = 'UPDATE formacion SET nom_centro = %s, desc_formacion = %s, fec_anio_inicio = %s, fec_anio_fin = %s, fec_modificacion = %s ' \
-            ' WHERE id_formacion = {}'.format(self.param['id_formacion'])
+
+        query = 'UPDATE formacion SET nom_centro = %s, desc_formacion = %s, fec_anio_inicio = %s, ' \
+                ' fec_anio_fin = %s, fec_modificacion = %s ' \
+                ' WHERE id_formacion = {}'.format(self.param['id_formacion'])
             
         values = (nom_centro, desc_formacion, fec_anio_inicio, fec_anio_fin, modification_date)
         
@@ -49,8 +50,8 @@ class Formacion:
     def response_data(self, results):
         if len(results) == 0:
             return {
-                '_status': 400,
-                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+                '_status': 404,
+                'message': 'Error, No existen datos en la tabla {}'.format(self.param['table']),
                 'emptyArray': []
             }
         else:
