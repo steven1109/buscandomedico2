@@ -9,6 +9,9 @@ from src.cLogin import Login as disLogin
 from src.cUbigeo import Ubigeo as disUbigeo
 from src.cEspecialidades import Especialidades as disEspecialidades
 from src.cEspecialidadMedico import EspecialidadMedico as disEspecialidadmedico
+from src.cProspecto import Prospecto as disProspecto
+
+
 # from loguru import logger
 
 
@@ -63,7 +66,8 @@ class Dispatcher:
             'consultorios': disConsultorios(parameters),
             'servicios': disServico(parameters),
             'especialidades': disEspecialidades(parameters),
-            'especialidadmedico': disEspecialidadmedico(parameters)
+            'especialidadmedico': disEspecialidadmedico(parameters),
+            'prospecto': disProspecto(parameters)
         }
 
     def add_data(self, parameters):
@@ -158,4 +162,3 @@ class Dispatcher:
         self.cur.execute(query)
         result = self.cur.fetchall()
         return result
-

@@ -2,6 +2,22 @@ from datetime import datetime
 import unicodedata
 
 
+def get_all():
+    query = ' SELECT me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,' \
+            ' me.cod_distrito,me.cod_provincia,me.codigo_cmp,me.comentario_personal,es.des_especialidad,' \
+            ' me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura,me.cod_departamento,' \
+            ' me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
+            ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
+            ' FROM medico me ' \
+            ' LEFT JOIN especialidad_medico esme on me.id_medico = esme.id_medico ' \
+            ' LEFT JOIN especialidad es on esme.id_especialidad = es.id_especialidad ' \
+            ' LEFT JOIN usuario us on me.id_medico = us.id_medico ' \
+            ' LEFT JOIN perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
+            ' ORDER BY me.ape_materno;'
+
+    return query
+
+
 class Medico:
     def __init__(self, parameters):
         self.param = parameters
@@ -23,12 +39,9 @@ class Medico:
         fec_nacimiento = self.param['fec_nacimiento']
         genero = self.param['genero']
         codigo_cmp = self.param['codigo_cmp']
-        atiende_covid = 0 if int(self.param['atiende_covid']) == 0 else int(
-            self.param['atiende_covid'])
-        atiende_vih = 0 if int(self.param['atiende_vih']) == 0 else int(
-            self.param['atiende_vih'])
-        videollamada = 0 if int(self.param['videollamada']) == 0 else int(
-            self.param['videollamada'])
+        atiende_covid = 0 if int(self.param['atiende_covid']) == 0 else int(self.param['atiende_covid'])
+        atiende_vih = 0 if int(self.param['atiende_vih']) == 0 else int(self.param['atiende_vih'])
+        videollamada = 0 if int(self.param['videollamada']) == 0 else int(self.param['videollamada'])
         descripcion_profesional = self.param['descripcion_profesional']
         facebook = self.param['facebook']
         instagram = self.param['instagram']
@@ -76,12 +89,9 @@ class Medico:
         fec_nacimiento = self.param['fec_nacimiento']
         genero = self.param['genero']
         codigo_cmp = self.param['codigo_cmp']
-        atiende_covid = 0 if int(self.param['atiende_covid']) == 0 else int(
-            self.param['atiende_covid'])
-        atiende_vih = 0 if int(self.param['atiende_vih']) == 0 else int(
-            self.param['atiende_vih'])
-        videollamada = 0 if int(self.param['videollamada']) == 0 else int(
-            self.param['videollamada'])
+        atiende_covid = 0 if int(self.param['atiende_covid']) == 0 else int(self.param['atiende_covid'])
+        atiende_vih = 0 if int(self.param['atiende_vih']) == 0 else int(self.param['atiende_vih'])
+        videollamada = 0 if int(self.param['videollamada']) == 0 else int(self.param['videollamada'])
         descripcion_profesional = self.param['descripcion_profesional']
         facebook = None if self.param['facebook'] == '' else self.param['facebook']
         instagram = None if self.param['instagram'] == '' else self.param['instagram']
@@ -105,21 +115,6 @@ class Medico:
 
     def delete_data(self):
         return 'UPDATE medico SET bol_activo = 0 WHERE id_medico = {}'.format(self.param['id_medico'])
-
-    def get_all(self):
-        query = ' SELECT me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,' \
-                ' me.cod_distrito,me.cod_provincia,me.codigo_cmp,me.comentario_personal,es.des_especialidad,' \
-                ' me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura,me.cod_departamento,' \
-                ' me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-                ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
-                ' FROM medico me ' \
-                ' LEFT JOIN especialidad_medico esme on me.id_medico = esme.id_medico ' \
-                ' LEFT JOIN especialidad es on esme.id_especialidad = es.id_especialidad ' \
-                ' LEFT JOIN usuario us on me.id_medico = us.id_medico ' \
-                ' LEFT JOIN perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
-                ' ORDER BY me.ape_materno;'
-
-        return query
 
     def get_medico_by_especialidad(self):
         clausulas = ''
@@ -176,8 +171,9 @@ class Medico:
                     map(lambda medicos: {
                         'id_medico': int(medicos[0]),
                         'perfil': medicos[19],
-                        'welcome': ('Dra. ' if medicos[4] == 1 else 'Dr. ') +
-                        medicos[1] + ', ' + medicos[2] + ' ' + medicos[3],
+                        'welcome':
+                            ('Dra. ' if medicos[4] == 1 else 'Dr. ') + medicos[1] +
+                            ', ' + medicos[2] + ' ' + medicos[3],
                         'nombre': medicos[1],
                         'ape_paterno': medicos[2],
                         'ape_materno': medicos[3],
@@ -208,7 +204,7 @@ class Medico:
         if len(results) == 0:
             response = {
                 '_status': 404,
-                'message': 'Lo sentimos, no se tiene respuesta a la busqueda que está haciendo',
+                'message': 'Error, No existen datos en la tabla {}'.format(self.param['table']),
                 'medicosArray': []
             }
 

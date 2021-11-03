@@ -1,6 +1,3 @@
-from datetime import datetime
-
-
 class Ubigeo:
     def __init__(self, parameters):
         self.param = parameters
@@ -25,7 +22,7 @@ class Ubigeo:
 
     def read_data(self):
         condition = ''
-        if self.param['value'] == "" and self.param['table'] != 'departamento':
+        if self.param['value'] == '' and self.param['table'] != 'departamento':
             query = ''
 
         if self.param['value'] != '' and self.param['field'] != '':

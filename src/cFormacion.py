@@ -13,19 +13,16 @@ class Formacion:
         fec_anio_fin = self.param['fec_anio_fin']
         fec_creacion = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        query = ' INSERT INTO formacion (id_medico,nom_centro,desc_formacion,fec_anio_inicio,fec_anio_fin,fec_creacion)  ' \
-            ' VALUES(%s,%s,%s,%s,%s,%s) '
+        query = ' INSERT INTO formacion (id_medico,nom_centro,desc_formacion,fec_anio_inicio,' \
+                ' fec_anio_fin,fec_creacion) VALUES(%s,%s,%s,%s,%s,%s) '
 
-        values = (id_medico, nom_centro, desc_formacion,
-                  fec_anio_inicio, fec_anio_fin, fec_creacion)
+        values = (id_medico, nom_centro, desc_formacion, fec_anio_inicio, fec_anio_fin, fec_creacion)
 
         return query, values
 
     def read_data(self):
         query = ' select id_formacion,id_medico,nom_centro,desc_formacion,fec_anio_inicio,fec_anio_fin,fec_creacion ' \
-            ' from formacion ' \
-            ' where id_medico = {}'.format(
-                str(self.param['id_medico']))
+                ' from formacion where id_medico = {}'.format(str(self.param['id_medico']))
 
         return query
 
@@ -36,16 +33,15 @@ class Formacion:
         fec_anio_fin = self.param['fec_anio_fin']
         modification_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        query = 'UPDATE formacion SET nom_centro = %s, desc_formacion = %s, fec_anio_inicio = %s, ' \
-                ' fec_anio_fin = %s, fec_modificacion = %s ' \
-                ' WHERE id_formacion = {}'.format(self.param['id_formacion'])
-            
+        query = 'UPDATE formacion SET nom_centro = %s, desc_formacion = %s, fec_anio_inicio = %s, fec_anio_fin = %s, ' \
+                ' fec_modificacion = %s WHERE id_formacion = {}'.format(self.param['id_formacion'])
+
         values = (nom_centro, desc_formacion, fec_anio_inicio, fec_anio_fin, modification_date)
-        
+
         return query, values
 
     def delete_data(self):
-        return 'delete from formacion WHERE id_formacion = {}'.format(self.param['id_formacion'])
+        return 'DELETE FROM formacion WHERE id_formacion = {}'.format(self.param['id_formacion'])
 
     def response_data(self, results):
         if len(results) == 0:
