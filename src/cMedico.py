@@ -222,3 +222,23 @@ class Medico:
                     }, results))}
 
         return response
+
+    def add_prospecto_medico(self, parameters):
+        self.param = parameters
+
+        id_prospecto = self.param['id_prospecto']
+        nombres = self.param['nombres']
+        ape_paterno = self.param['ape_paterno']
+        ape_materno = self.param['ape_materno']
+        fec_nacimiento = self.param['fec_nacimiento']
+        genero = self.param['genero']
+        codigo_cmp = self.param['codigo_cmp']
+        creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        query = ' INSERT INTO medico (id_prospecto,nombres,ape_paterno,ape_materno,fec_nacimiento,' \
+                ' genero,codigo_cmp,bol_activo,fec_creacion) ' \
+                ' VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) '
+
+        values = (id_prospecto, nombres, ape_paterno, ape_materno, fec_nacimiento, genero, codigo_cmp, 1, creation_date)
+
+        return query, values

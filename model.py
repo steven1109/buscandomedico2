@@ -77,6 +77,12 @@ class Dispatcher:
             self.reConnect()
             self.cur.execute(query, values)
             self.conn.commit()
+            if parameters['table'] == 'prospecto' and parameters['estado'] == 'Aprobado':
+                parameters['id_prospecto'] = self.cur.lastrowid
+                query, values = dispatcher['medico'].add_prospecto_medico(parameters)
+                self.reConnect()
+                self.cur.execute(query, values)
+                self.conn.commit()
             return {
                 '_status': 200,
                 'message': 'Los datos de {}, se han registrado de manera correcta'.format(parameters['table'])
