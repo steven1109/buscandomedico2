@@ -2,22 +2,6 @@ from datetime import datetime
 import unicodedata
 
 
-def get_all():
-    query = ' SELECT me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,' \
-            ' me.cod_distrito,me.cod_provincia,me.codigo_cmp,me.comentario_personal,es.des_especialidad,' \
-            ' me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura,me.cod_departamento,' \
-            ' me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
-            ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
-            ' FROM medico me ' \
-            ' LEFT JOIN especialidad_medico esme on me.id_medico = esme.id_medico ' \
-            ' LEFT JOIN especialidad es on esme.id_especialidad = es.id_especialidad ' \
-            ' LEFT JOIN usuario us on me.id_medico = us.id_medico ' \
-            ' LEFT JOIN perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
-            ' ORDER BY me.ape_materno;'
-
-    return query
-
-
 class Medico:
     def __init__(self, parameters):
         self.param = parameters
@@ -115,6 +99,23 @@ class Medico:
 
     def delete_data(self):
         return 'UPDATE medico SET bol_activo = 0 WHERE id_medico = {}'.format(self.param['id_medico'])
+
+    def get_all(self):
+        where = 'WHERE id_medico = ' + str(self.param['id_medico']) if self.param['id_medico'] != '' else ''
+        query = ' SELECT me.id_medico,me.nombres,me.ape_paterno,me.ape_materno,me.genero,me.cod_departamento,' \
+                ' me.cod_distrito,me.cod_provincia,me.codigo_cmp,me.comentario_personal,es.des_especialidad,' \
+                ' me.fec_nacimiento,es.id_especialidad,esme.codigo_rne,me.fec_colegiatura,me.cod_departamento,' \
+                ' me.cod_provincia,me.cod_distrito,us.des_correo,pu.des_perfil_usuario,me.flag_atiende_covid, ' \
+                ' me.flag_Atiende_vih,me.flag_atiende_videollamada,me.facebook,me.instagram,me.twitter,me.linkedin ' \
+                ' FROM medico me ' \
+                ' LEFT JOIN especialidad_medico esme on me.id_medico = esme.id_medico ' \
+                ' LEFT JOIN especialidad es on esme.id_especialidad = es.id_especialidad ' \
+                ' LEFT JOIN usuario us on me.id_medico = us.id_medico ' \
+                ' LEFT JOIN perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
+                ' {} ' \
+                ' ORDER BY me.ape_materno;'.format(where)
+
+        return query
 
     def get_medico_by_especialidad(self):
         clausulas = ''
