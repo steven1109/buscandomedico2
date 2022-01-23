@@ -21,7 +21,7 @@ class Login:
     def get_all(self):
         query = ' select us.id_medico,pu.des_perfil_usuario,us.des_correo,us.des_pass,me.nombres,me.ape_paterno, ' \
                 ' me.ape_materno,me.genero,me.fec_nacimiento,me.codigo_cmp,es.id_especialidad, ' \
-                ' es.des_especialidad,esme.codigo_rne ' \
+                ' es.des_especialidad,esme.codigo_rne,pu.id_perfil_usuario ' \
                 ' from usuario us ' \
                 ' inner join perfil_usuario pu on us.id_perfil_usuario = pu.id_perfil_usuario ' \
                 ' left join medico me on us.id_medico = me.id_medico ' \
@@ -49,7 +49,8 @@ class Login:
                         'genero': '',
                         'id_especialidad': '',
                         'des_especialidad': '',
-                        'rme': ''
+                        'rme': '',
+                        'id_perfil_usuario': result[13]
                     }
                 else:
                     response = {
@@ -66,7 +67,8 @@ class Login:
                         'genero': result[7],
                         'id_especialidad': result[10],
                         'des_especialidad': result[11],
-                        'rme': result[12]
+                        'rme': result[12],
+                        'id_perfil_usuario': result[13]
                     }
                 break
 

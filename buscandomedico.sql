@@ -76,8 +76,9 @@ CREATE TABLE prospecto
 	genero               integer  NOT NULL ,
 	num_contacto         varchar(15)  NOT NULL ,
 	email_contacto       varchar(100)  NOT NULL ,
-	comentario_duda      varchar(500)  NOT NULL ,
-	hora_comunicacion    varchar(100)  NOT NULL ,
+    codigo_cmp           varchar(20)  NOT NULL ,
+    observacion			 varchar(200),
+    estado				 boolean,
 	fec_creacion         datetime  NOT NULL ,
 	fec_modificacion     datetime  default NULL 
 );
@@ -118,7 +119,7 @@ CREATE TABLE medico
 	instagram            		varchar(100)  DEFAULT NULL ,
 	twitter              		varchar(100)  DEFAULT NULL ,
 	linkedin             		varchar(100)  DEFAULT NULL,
-	bol_activo			 		boolean NOT NULL , --- campo nuevo agregado, falta aumentar en la db y hacer un insert
+	bol_activo			 		boolean NOT NULL ,
 	fec_creacion         		datetime  NOT NULL ,
 	fec_modificacion     		datetime DEFAULT NULL
 );
@@ -166,6 +167,7 @@ CREATE TABLE enfermedades_tratadas
 	id_enf_tratadas      integer PRIMARY KEY auto_increment ,
 	id_medico            integer  NOT NULL ,
 	des_enfermedades     varchar(500)  NOT NULL ,
+	des_tratamiento		 varchar(1000),
 	fec_creacion         datetime  NOT NULL ,
 	fec_modificacion     datetime default NULL 
 );
@@ -176,6 +178,11 @@ CREATE TABLE especialidad_medico
 	id_especialidad          integer not null ,
 	id_medico                integer  NOT NULL ,
 	codigo_rne               varchar(10)  NULL ,
+    fec_egresado			 datetime  not null,
+	cmp						 varchar(20) not null ,
+    flag_visible			 boolean,
+	observacion				 varchar(200),
+	estado					 boolean,
 	fec_creacion             datetime  NOT NULL ,
 	fec_modificacion         datetime  default NULL 
 );
@@ -208,6 +215,7 @@ CREATE TABLE servicio
 	id_consultorio		 integer NOT NULL,
 	des_servicio         varchar(200)  NOT NULL ,
 	num_precio           decimal(10,2)  NOT NULL ,
+	flag_mostrar_precio  boolean,
 	fec_creacion         datetime  NOT NULL ,
 	fec_modificacion     datetime  default NULL 
 );
