@@ -236,10 +236,13 @@ class Medico:
         codigo_cmp = self.param['codigo_cmp']
         creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        query = ' INSERT INTO medico (id_prospecto,nombres,ape_paterno,ape_materno,fec_nacimiento,' \
-                ' genero,codigo_cmp,bol_activo,fec_creacion) ' \
-                ' VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) '
+        query = ' INSERT INTO medico (cod_distrito, cod_provincia, cod_departamento, id_prospecto,nombres,' \
+                ' ape_paterno,ape_materno,fec_nacimiento,' \
+                ' genero,codigo_cmp,bol_activo,fec_creacion, flag_atiende_covid, ' \
+                ' flag_Atiende_vih, flag_atiende_videollamada, comentario_personal) ' \
+                ' VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) '
 
-        values = (id_prospecto, nombres, ape_paterno, ape_materno, fec_nacimiento, genero, codigo_cmp, 1, creation_date)
+        values = (0, 0, 0, id_prospecto, nombres, ape_paterno, ape_materno,
+                  fec_nacimiento, genero, codigo_cmp, 1, creation_date, 0, 0, 0, "Sin comentarios")
 
         return query, values

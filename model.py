@@ -1,3 +1,4 @@
+from unittest import result
 from config import DBMySql
 import pymysql
 from src.cMedico import Medico as disMedico
@@ -72,25 +73,45 @@ class Dispatcher:
             'servicios': disServico(self.param),
             'especialidades': disEspecialidades(self.param),
             'especialidadmedico': disEspecialidadmedico(self.param),
-            'prospecto': disProspecto(self.param)
+            'prospecto': disProspecto(self.param),
+            'login': disLogin(self.param)
         }
 
     def add_data(self):
         dis = self.dispatcher()
         try:
+            if self.param['table'] == 'prospecto':
+                estado_prospecto = dis[self.param['table']].validate_prospecto(
+                ) if self.param['table'] == 'prospecto' else ''
+                results = self.executeQuery(estado_prospecto)
+                if len(results) > 0:
+                    message = ''
+                    for row in results:
+                        if 'aprobado' in row[2].lower():
+                            message = 'El CMP que ha ingresado ya está registrado, valide que sus datos sean correctos'
+                            break
+                        elif 'revisión' in row[2].lower():
+                            message = 'Estimado Doctor, su Cmp se encuentra en validación. ' \
+                                      'De ser un CMP correcto en 48 horas se le brindará acceso al portal, ' \
+                                      'caso contrario se le indicará el motivo del rechazo.'
+                            break
+                        elif 'anulado' in row[2].lower():
+                            message = ''
+
+                    if message != '':
+                        return {
+                            '_status': 401,
+                            'message': message
+                        }
+
             query, values = dis[self.param['table']].add_data()
             self.reConnect()
             self.cur.execute(query, values)
             self.conn.commit()
-            if self.param['table'] == 'prospecto' and self.param['estado'] == 'Aprobado':
-                self.param['id_prospecto'] = self.cur.lastrowid
-                query, values = dis['medico'].add_prospecto_medico(self.param)
-                self.reConnect()
-                self.cur.execute(query, values)
-                self.conn.commit()
+
             return {
                 '_status': 200,
-                'message': 'Los datos de {}, se han registrado de manera correcta'.format(self.param['table'])
+                'message': 'Los datos se han registrado de manera correcta'
             }
         except (pymysql.MySQLError, Exception) as e:
             self.msg = e
@@ -115,16 +136,40 @@ class Dispatcher:
 
     def update_data(self):
         dis = self.dispatcher()
+        password = None
         try:
             # logger.info('Updating data...')
             query, values = dis[self.param['table']].update_data()
             self.reConnect()
             self.cur.execute(query, values)
             self.conn.commit()
-            return {
-                '_status': 200,
-                'message': 'Los datos se han actualizado correctamente'
-            }
+            if self.param['table'] == 'prospecto' and self.param['observacion'] == 'Aprobado':
+                query, values = dis['medico'].add_prospecto_medico(self.param)
+                self.reConnect()
+                self.cur.execute(query, values)
+                self.conn.commit()
+
+                # Agregando prospecto nuevo a la tabla usuario
+                query = f"select * from medico where codigo_cmp = '{self.param['codigo_cmp']}'"
+                results = self.executeQuery(query)
+                self.param['id_medico'] = results[0][0]
+                query, values, password = dis['login'].add_user()
+                self.reConnect()
+                self.cur.execute(query, values)
+                self.conn.commit()
+
+            if self.param['table'] == 'prospecto':
+                return {
+                    '_status': 200,
+                    'message': 'Los datos se han actualizado correctamente',
+                    'datos': f'Su credenciales son: \n Usuario: {self.param["email_contacto"]} \n'
+                             f' Clave: {password}'
+                }
+            else:
+                return {
+                    '_status': 200,
+                    'message': 'Los datos se han actualizado correctamente'
+                }
         except (pymysql.MySQLError, Exception) as e:
             self.msg = e
             self.errorResult()

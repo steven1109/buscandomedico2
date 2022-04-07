@@ -93,3 +93,9 @@ class Prospecto:
             }
 
         return response
+
+    def validate_prospecto(self):
+        query = "SELECT id_prospecto,codigo_cmp,observacion,estado FROM prospecto WHERE codigo_cmp = '{}' " \
+                " and observacion != 'Anulado';". format(self.param['codigo_cmp'])
+
+        return query

@@ -33,7 +33,7 @@ class EspecialidadMedico:
 
         query = ' SELECT em.id_especialidad_medico, em.id_especialidad, es.des_especialidad, ' \
                 ' em.id_medico, me.nombres, me.ape_paterno, me.ape_materno, em.codigo_rne, ' \
-                ' em.fec_egresado, em.cmp, em.flag_visible, em.fec_creacion, me.bol_activo ' \
+                ' em.fec_egresado, em.cmp, em.flag_visible, em.fec_creacion, me.bol_activo, ' \
                 ' em.observacion, em.estado ' \
                 ' FROM especialidad_medico em ' \
                 ' INNER JOIN especialidad es ON em.id_especialidad = es.id_especialidad ' \

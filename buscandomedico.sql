@@ -1,5 +1,5 @@
 CREATE TABLE pais
-( 
+(
 	id_pais              integer PRIMARY KEY AUTO_INCREMENT ,
 	cod_pais             varchar(10)  NOT NULL ,
 	des_pais             varchar(100)  NOT NULL ,
@@ -146,7 +146,8 @@ CREATE TABLE consultorio
 	des_direccion        varchar(100)  NULL ,
 	fec_creacion         datetime NOT NULL ,
 	fec_modificacion     datetime DEFAULT NULL ,
-	horario_atencion     varchar(30)  NULL 
+	horario_inicio       varchar(30)  NULL,
+	horario_fin          varchar(30)  NULL
 );
 
 CREATE TABLE documento_venta
